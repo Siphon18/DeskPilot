@@ -81,6 +81,7 @@ export const desktopApi = {
       invoke<WindowsThemeColorDTO>('settings_get_windows_theme_color'),
   },
   window: {
+    startDragging: (): Promise<void> => invoke<void>('start_dragging'),
     hide: (): Promise<void> => invoke<void>('window_hide'),
     show: (): Promise<void> => invoke<void>('window_show'),
     minimize: (): Promise<void> => invoke<void>('window_minimize'),

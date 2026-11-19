@@ -25,7 +25,7 @@
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 10px;
-  --radius-dialog: 12px;
+  --radius-dialog: 10px;
 
   /* Transitions (Section 6.7: 120-160ms ease-out) */
   --transition-fast: 120ms ease-out;
@@ -34,45 +34,45 @@
   /* Active Windows Theme Accent Color (Default values, synced dynamically via Rust DWM API) */
   --win-accent: #4c8dfa;
   --win-accent-rgb: 76, 141, 250;
-  --win-accent-glow: rgba(76, 141, 250, 0.35);
-  --win-accent-subtle: rgba(76, 141, 250, 0.12);
-  --win-accent-highlight: rgba(76, 141, 250, 0.2);
-  --win-accent-border: rgba(76, 141, 250, 0.3);
+  --win-accent-glow: rgba(76, 141, 250, 0.15);
+  --win-accent-subtle: rgba(76, 141, 250, 0.1);
+  --win-accent-highlight: rgba(76, 141, 250, 0.15);
+  --win-accent-border: rgba(76, 141, 250, 0.25);
 
-  /* Liquid Glass Core Atmosphere & Blur Tokens (Section 6.3) */
-  --liquid-blur: blur(20px);
-  --liquid-blur-overlay: blur(28px) saturate(180%);
-  --liquid-aura-primary: radial-gradient(circle at 85% 12%, var(--win-accent-glow) 0%, transparent 48%);
-  --liquid-aura-secondary: radial-gradient(circle at 10% 88%, rgba(var(--win-accent-rgb), 0.12) 0%, transparent 42%);
+  /* Fluent Liquid Glass Core Atmosphere & Blur Tokens (Section 6.3) */
+  --liquid-blur: blur(24px);
+  --liquid-blur-overlay: blur(28px) saturate(160%);
+  --liquid-aura-primary: radial-gradient(circle at 85% 10%, rgba(var(--win-accent-rgb), 0.08) 0%, transparent 45%);
+  --liquid-aura-secondary: transparent;
 }
 
-/* Default Dark Fluent Liquid Glass Theme (Section 6.4) */
+/* Default Dark Fluent Theme (Section 6.4) */
 :root, [data-theme="dark"] {
-  --bg-app: rgba(17, 21, 27, 0.72);
-  --bg-sidebar: rgba(20, 25, 34, 0.65);
-  --bg-card: rgba(28, 35, 46, 0.68);
-  --bg-card-hover: rgba(36, 45, 59, 0.82);
-  --bg-subtle: rgba(30, 39, 53, 0.52);
-  --bg-input: rgba(16, 20, 28, 0.8);
-  --bg-modal: rgba(22, 28, 38, 0.85);
-  --bg-overlay: rgba(8, 11, 16, 0.6);
+  --bg-app: rgba(18, 22, 29, 0.88);
+  --bg-sidebar: rgba(22, 27, 36, 0.7);
+  --bg-card: rgba(28, 35, 46, 0.7);
+  --bg-card-hover: rgba(36, 45, 58, 0.85);
+  --bg-subtle: rgba(30, 39, 53, 0.5);
+  --bg-input: rgba(18, 22, 30, 0.85);
+  --bg-modal: rgba(24, 30, 40, 0.92);
+  --bg-overlay: rgba(0, 0, 0, 0.5);
 
   --text-primary: #f3f5f8;
   --text-secondary: #aeb8c6;
   --text-tertiary: #7c8899;
   --text-disabled: #546070;
 
-  --border-subtle: rgba(230, 238, 248, 0.08);
-  --border-default: rgba(230, 238, 248, 0.12);
-  --border-hover: rgba(var(--win-accent-rgb), 0.35);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.15);
   --border-focus: var(--win-accent, #4c8dfa);
-  --border-glass: rgba(255, 255, 255, 0.12);
+  --border-glass: rgba(255, 255, 255, 0.08);
 
   --accent-primary: var(--win-accent, #4c8dfa);
   --accent-hover: var(--win-accent, #3b7be8);
   --accent-active: var(--win-accent, #2d6cd6);
   --accent-text: #ffffff;
-  --accent-subtle: var(--win-accent-subtle, rgba(76, 141, 250, 0.12));
+  --accent-subtle: var(--win-accent-subtle, rgba(76, 141, 250, 0.1));
 
   --status-success: #10b981;
   --status-success-bg: rgba(16, 185, 129, 0.14);
@@ -81,33 +81,33 @@
   --status-error: #ef4444;
   --status-error-bg: rgba(239, 68, 68, 0.14);
 
-  --shadow-glass-rim: inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
-  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
-  --shadow-flyout: 0 12px 28px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
-  --shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.55), 0 0 32px var(--win-accent-glow), inset 0 1px 0 0 rgba(255, 255, 255, 0.22);
+  --shadow-glass-rim: none;
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.22);
+  --shadow-flyout: 0 10px 24px rgba(0, 0, 0, 0.4);
+  --shadow-modal: 0 16px 44px rgba(0, 0, 0, 0.55);
 }
 
-/* Light Liquid Glass Theme (Section 6.4) */
+/* Light Fluent Theme (Section 6.4) */
 [data-theme="light"] {
-  --bg-app: rgba(243, 245, 248, 0.75);
-  --bg-sidebar: rgba(247, 250, 255, 0.7);
-  --bg-card: rgba(255, 255, 255, 0.75);
-  --bg-card-hover: rgba(255, 255, 255, 0.9);
-  --bg-subtle: rgba(240, 244, 250, 0.65);
-  --bg-input: rgba(255, 255, 255, 0.9);
-  --bg-modal: rgba(255, 255, 255, 0.9);
-  --bg-overlay: rgba(0, 0, 0, 0.35);
+  --bg-app: rgba(243, 245, 248, 0.88);
+  --bg-sidebar: rgba(247, 250, 255, 0.75);
+  --bg-card: rgba(255, 255, 255, 0.82);
+  --bg-card-hover: rgba(255, 255, 255, 0.95);
+  --bg-subtle: rgba(240, 244, 250, 0.7);
+  --bg-input: rgba(255, 255, 255, 0.95);
+  --bg-modal: rgba(255, 255, 255, 0.96);
+  --bg-overlay: rgba(0, 0, 0, 0.3);
 
   --text-primary: #1b1f24;
   --text-secondary: #596575;
   --text-tertiary: #7c8899;
   --text-disabled: #a0acba;
 
-  --border-subtle: rgba(35, 49, 66, 0.08);
-  --border-default: rgba(35, 49, 66, 0.14);
-  --border-hover: rgba(var(--win-accent-rgb), 0.35);
+  --border-subtle: rgba(0, 0, 0, 0.05);
+  --border-default: rgba(0, 0, 0, 0.09);
+  --border-hover: rgba(0, 0, 0, 0.18);
   --border-focus: var(--win-accent, #2463d3);
-  --border-glass: rgba(255, 255, 255, 0.6);
+  --border-glass: rgba(0, 0, 0, 0.08);
 
   --accent-primary: var(--win-accent, #2463d3);
   --accent-hover: var(--win-accent, #1d52b4);
@@ -122,10 +122,10 @@
   --status-error: #ef4444;
   --status-error-bg: #fee2e2;
 
-  --shadow-glass-rim: inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
-  --shadow-flyout: 0 8px 20px rgba(0, 0, 0, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
-  --shadow-modal: 0 16px 40px rgba(0, 0, 0, 0.18), 0 0 24px var(--win-accent-glow), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+  --shadow-glass-rim: none;
+  --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.06);
+  --shadow-flyout: 0 8px 20px rgba(0, 0, 0, 0.12);
+  --shadow-modal: 0 16px 36px rgba(0, 0, 0, 0.18);
 }
 
 /* High Contrast / Reduced Motion (Section 6.7 & 6.9) */

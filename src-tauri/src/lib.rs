@@ -191,6 +191,7 @@ pub fn run() {
             commands::settings::settings_update,
             commands::settings::settings_open_data_folder,
             commands::settings::settings_get_windows_theme_color,
+            commands::window::start_dragging,
             commands::window::window_hide,
             commands::window::window_show,
             commands::window::window_minimize,

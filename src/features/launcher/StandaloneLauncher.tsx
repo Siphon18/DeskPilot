@@ -23,7 +23,6 @@ export const StandaloneLauncher: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { showToast } = useToast();
 
-  // Load workspaces on mount & listen for refresh events
   const loadWorkspaces = async () => {
     try {
       const data = await desktopApi.workspaces.list();
@@ -35,22 +34,18 @@ export const StandaloneLauncher: React.FC = () => {
 
   useEffect(() => {
     loadWorkspaces();
-    // Focus search input
-    setTimeout(() => inputRef.current?.focus(), 50);
+    setTimeout(() => inputRef.current?.focus(), 40);
 
     // Dynamic accent color from Windows Registry
     desktopApi.settings.getWindowsThemeColor().then((color) => {
       const root = document.documentElement;
       root.style.setProperty('--win-accent', color.hex);
       root.style.setProperty('--win-accent-rgb', `${color.r}, ${color.g}, ${color.b}`);
-      root.style.setProperty('--win-accent-glow', color.accentGlow);
       root.style.setProperty('--win-accent-subtle', color.accentSubtle);
-      root.style.setProperty('--win-accent-highlight', color.liquidHighlight);
-      root.style.setProperty('--win-accent-border', `rgba(${color.r}, ${color.g}, ${color.b}, 0.3)`);
+      root.style.setProperty('--win-accent-border', `rgba(${color.r}, ${color.g}, ${color.b}, 0.25)`);
     }).catch(() => {});
   }, []);
 
-  // Filter workspaces
   const filtered = useMemo(() => {
     let list = [...workspaces];
     if (query.trim()) {
@@ -85,7 +80,6 @@ export const StandaloneLauncher: React.FC = () => {
   const handleLaunch = async (id: string) => {
     try {
       await desktopApi.launch.start(id);
-      // Immediately hide launcher back into background
       handleClose();
     } catch (err: any) {
       showToast(err.message || 'Failed to launch workspace', 'error');
@@ -107,6 +101,13 @@ export const StandaloneLauncher: React.FC = () => {
       await desktopApi.window.openMainDashboard();
     } catch {
       // fallback
+    }
+  };
+
+  const handleHeaderMouseDown = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (e.buttons === 1 && !target.closest('input') && !target.closest('button')) {
+      desktopApi.window.startDragging().catch(() => {});
     }
   };
 
@@ -151,10 +152,14 @@ export const StandaloneLauncher: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.card} data-tauri-drag-region>
-        {/* Search header with instant focus */}
-        <div className={styles.searchHeader} data-tauri-drag-region>
-          <Search size={16} className={styles.searchIcon} />
+      <div className={styles.card}>
+        {/* Header Search with Drag Handle */}
+        <div
+          className={styles.searchHeader}
+          data-tauri-drag-region
+          onMouseDown={handleHeaderMouseDown}
+        >
+          <Search size={15} className={styles.searchIcon} data-tauri-drag-region />
           <input
             ref={inputRef}
             type="text"
@@ -165,7 +170,12 @@ export const StandaloneLauncher: React.FC = () => {
             onKeyDown={handleKeyDown}
           />
           <span className={styles.shortcutBadge}>Ctrl + Space</span>
-          <button className={styles.closeBtn} onClick={handleClose} title="Close (Esc)">
+          <button
+            className={styles.closeBtn}
+            onClick={handleClose}
+            title="Close (Esc)"
+            aria-label="Close"
+          >
             <X size={14} />
           </button>
         </div>
@@ -211,7 +221,7 @@ export const StandaloneLauncher: React.FC = () => {
                       title={`Launch ${ws.name}`}
                       aria-label={`Launch ${ws.name}`}
                     >
-                      <Play size={12} fill="currentColor" strokeWidth={0} />
+                      <Play size={11} fill="currentColor" strokeWidth={0} />
                     </button>
                   </div>
                 </div>
@@ -220,7 +230,7 @@ export const StandaloneLauncher: React.FC = () => {
           )}
         </div>
 
-        {/* Quick Utility Actions Divider & Rows */}
+        {/* Quick Utility Actions */}
         <div className={styles.quickActionsSection}>
           <button className={styles.actionRow} onClick={handleCaptureDesktop}>
             <Camera size={14} className={styles.actionIcon} />
@@ -230,18 +240,18 @@ export const StandaloneLauncher: React.FC = () => {
 
           <button className={styles.actionRow} onClick={handleOpenSettings}>
             <Settings size={14} className={styles.actionIcon} />
-            <span className={styles.actionLabel}>Open Settings & Workspaces</span>
+            <span className={styles.actionLabel}>Settings & Full Dashboard</span>
             <span className={styles.actionBadge}>Settings</span>
           </button>
         </div>
 
         {/* Footer shortcuts hint */}
-        <div className={styles.footer}>
-          <div className={styles.brandTag}>
+        <div className={styles.footer} data-tauri-drag-region onMouseDown={handleHeaderMouseDown}>
+          <div className={styles.brandTag} data-tauri-drag-region>
             <span className={styles.brandDot} />
-            <span>DeskPilot</span>
+            <span data-tauri-drag-region>DeskPilot</span>
           </div>
-          <span className={styles.closeHint}>Press Esc to close</span>
+          <span className={styles.closeHint} data-tauri-drag-region>Press Esc to close</span>
         </div>
       </div>
     </div>
