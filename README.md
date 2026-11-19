@@ -25,9 +25,11 @@ DeskPilot is a personal productivity utility built specifically for Windows 11 a
   - **Notes:** Autosaving Markdown/plain-text scratchpad per workspace with debounced background saving.
   - **Checklists:** Interactive task lists with completion status and progress tracking.
 
-- **Quick Switcher & Global Shortcut:**
-  - Global hotkey: `Ctrl + Alt + Space` summons the switcher from anywhere while DeskPilot is running.
-  - In-app hotkey: `Ctrl + K` opens the quick switcher directly from the window.
+- **Quick Launcher & Global Shortcuts:**
+  - Global hotkeys: `Ctrl + Space` or `Alt + Space` summons the standalone Quick Launcher popup with native Windows Acrylic blur and accent colors.
+  - In-app hotkeys: `Ctrl + K` or `Ctrl + Space` opens the quick switcher.
+  - 1-Click Desktop Capture: `Ctrl + Shift + C` automatically snapshots all running window applications into a ready-to-launch workspace.
+  - Launch Last Workspace: `Ctrl + Shift + L` triggers your most recent workspace instantly.
   - Keyboard-driven navigation: Arrow keys to browse, Enter to launch, Escape to dismiss.
 
 - **Activity & Audit History:**
@@ -142,4 +144,4 @@ All configuration, workspaces, and audit history are stored in your Windows user
 - [x] Debounced autosaving workspace notes and interactive checklist with progress tracking.
 - [x] Quick Switcher opens globally (`Ctrl + Alt + Space`) and in-app (`Ctrl + K`).
 - [x] Activity history stores run snapshots and per-item timing/error codes.
-- [x] All 10 backend tests pass; frontend compiles with zero errors.
+- [x] All 12 backend tests pass; frontend compiles with zero errors.
