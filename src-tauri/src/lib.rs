@@ -35,20 +35,32 @@ pub fn run() {
                 let _ = database::repositories::launch_repo::prune_old_runs(&conn);
             }
 
-            // Apply Windows 11 Mica / Acrylic native liquid glass effect to both windows
+            // Apply Windows 11 Acrylic native liquid glass effect to both windows
             #[cfg(target_os = "windows")]
             {
-                use window_vibrancy::{apply_mica, apply_acrylic};
+                use window_vibrancy::{apply_acrylic, apply_blur};
+                use windows::Win32::Graphics::Dwm::{DwmSetWindowAttribute, DWMWA_USE_IMMERSIVE_DARK_MODE};
+                use windows::Win32::Foundation::HWND;
 
-                if let Some(main) = app.get_webview_window("main") {
-                    if apply_mica(&main, Some(true)).is_err() {
-                        let _ = apply_acrylic(&main, Some((17, 21, 27, 210)));
-                    }
-                }
+                for win_label in &["main", "launcher"] {
+                    if let Some(window) = app.get_webview_window(win_label) {
+                        if let Ok(hwnd) = window.hwnd() {
+                            let win_hwnd = HWND(hwnd.0);
+                            let dark_mode: u32 = 1;
+                            unsafe {
+                                let _ = DwmSetWindowAttribute(
+                                    win_hwnd,
+                                    DWMWA_USE_IMMERSIVE_DARK_MODE,
+                                    &dark_mode as *const _ as _,
+                                    std::mem::size_of::<u32>() as u32,
+                                );
+                            }
+                        }
 
-                if let Some(launcher) = app.get_webview_window("launcher") {
-                    if apply_acrylic(&launcher, Some((20, 26, 36, 220))).is_err() {
-                        let _ = apply_mica(&launcher, Some(true));
+                        // Apply Windows 11 Acrylic blur behind with blur fallback
+                        if apply_acrylic(&window, Some((16, 22, 32, 120))).is_err() {
+                            let _ = apply_blur(&window, Some((16, 22, 32, 120)));
+                        }
                     }
                 }
             }

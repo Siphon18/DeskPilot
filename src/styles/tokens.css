@@ -38,68 +38,69 @@
   /* Active Windows Theme Accent Color (Default Windows 11 Blue, overridden via registry) */
   --win-accent: #0078d4;
   --win-accent-rgb: 0, 120, 212;
-  --win-accent-subtle: rgba(0, 120, 212, 0.12);
-  --win-accent-border: rgba(0, 120, 212, 0.3);
+  --win-accent-subtle: rgba(0, 120, 212, 0.16);
+  --win-accent-border: rgba(0, 120, 212, 0.35);
 
-  /* Acrylic / Mica Liquid Material Tokens */
-  --liquid-blur: blur(28px) saturate(150%);
+  /* Fluent Liquid Glass Core Atmosphere & Blur */
+  --liquid-blur: blur(28px) saturate(160%);
 }
 
-/* Dark Fluent Theme (Default for Windows 11 Desktop Utility) */
+/* Dark Fluent Acrylic Glass Theme */
 :root, [data-theme="dark"] {
-  --bg-window: rgba(18, 22, 29, 0.94);
-  --bg-sidebar: rgba(15, 18, 24, 0.85);
-  --bg-app: rgba(20, 25, 34, 0.88);
-  --bg-card: rgba(26, 33, 44, 0.72);
-  --bg-card-hover: rgba(33, 42, 56, 0.88);
-  --bg-card-active: rgba(40, 51, 68, 0.95);
-  --bg-subtle: rgba(255, 255, 255, 0.04);
-  --bg-subtle-hover: rgba(255, 255, 255, 0.08);
-  --bg-input: rgba(16, 20, 27, 0.9);
-  --bg-modal: rgba(22, 28, 38, 0.97);
-  --bg-keycap: rgba(255, 255, 255, 0.06);
+  /* True translucent acrylic glass surfaces: allowing native DWM blur to shine through */
+  --bg-window: rgba(18, 22, 30, 0.58);
+  --bg-sidebar: rgba(14, 18, 25, 0.45);
+  --bg-app: transparent;
+  --bg-card: rgba(26, 33, 46, 0.55);
+  --bg-card-hover: rgba(34, 43, 62, 0.72);
+  --bg-card-active: rgba(42, 53, 76, 0.85);
+  --bg-subtle: rgba(255, 255, 255, 0.05);
+  --bg-subtle-hover: rgba(255, 255, 255, 0.09);
+  --bg-input: rgba(14, 18, 26, 0.75);
+  --bg-modal: rgba(20, 26, 38, 0.88);
+  --bg-keycap: rgba(255, 255, 255, 0.07);
 
   --text-primary: #f3f5f8;
-  --text-secondary: #9da8b6;
-  --text-tertiary: #6e7987;
-  --text-disabled: #47505d;
+  --text-secondary: #a4b0bf;
+  --text-tertiary: #758293;
+  --text-disabled: #4a5462;
 
-  --border-subtle: rgba(255, 255, 255, 0.05);
-  --border-default: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.14);
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-default: rgba(255, 255, 255, 0.10);
+  --border-hover: rgba(255, 255, 255, 0.18);
   --border-focus: var(--win-accent, #0078d4);
-  --border-keycap: rgba(255, 255, 255, 0.1);
+  --border-keycap: rgba(255, 255, 255, 0.12);
 
   --accent-primary: var(--win-accent, #0078d4);
   --accent-hover: #1084d8;
   --accent-active: #006cbe;
   --accent-text: #ffffff;
-  --accent-subtle: var(--win-accent-subtle, rgba(0, 120, 212, 0.12));
+  --accent-subtle: var(--win-accent-subtle, rgba(0, 120, 212, 0.16));
 
   --status-success: #10b981;
-  --status-success-bg: rgba(16, 185, 129, 0.14);
+  --status-success-bg: rgba(16, 185, 129, 0.16);
   --status-warning: #f59e0b;
-  --status-warning-bg: rgba(245, 158, 11, 0.14);
+  --status-warning-bg: rgba(245, 158, 11, 0.16);
   --status-error: #ef4444;
-  --status-error-bg: rgba(239, 68, 68, 0.14);
+  --status-error-bg: rgba(239, 68, 68, 0.16);
 
   --shadow-window: 0 16px 40px rgba(0, 0, 0, 0.5);
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.18);
   --shadow-flyout: 0 12px 28px rgba(0, 0, 0, 0.45);
 }
 
-/* Light Fluent Theme */
+/* Light Fluent Acrylic Glass Theme */
 [data-theme="light"] {
-  --bg-window: rgba(244, 246, 249, 0.94);
-  --bg-sidebar: rgba(238, 241, 246, 0.85);
-  --bg-app: rgba(248, 250, 252, 0.88);
-  --bg-card: rgba(255, 255, 255, 0.85);
-  --bg-card-hover: rgba(255, 255, 255, 0.98);
-  --bg-card-active: rgba(240, 243, 248, 0.98);
+  --bg-window: rgba(244, 246, 250, 0.65);
+  --bg-sidebar: rgba(238, 241, 247, 0.55);
+  --bg-app: transparent;
+  --bg-card: rgba(255, 255, 255, 0.65);
+  --bg-card-hover: rgba(255, 255, 255, 0.85);
+  --bg-card-active: rgba(240, 243, 248, 0.95);
   --bg-subtle: rgba(0, 0, 0, 0.04);
   --bg-subtle-hover: rgba(0, 0, 0, 0.07);
-  --bg-input: rgba(255, 255, 255, 0.95);
-  --bg-modal: rgba(255, 255, 255, 0.98);
+  --bg-input: rgba(255, 255, 255, 0.85);
+  --bg-modal: rgba(255, 255, 255, 0.92);
   --bg-keycap: rgba(0, 0, 0, 0.05);
 
   --text-primary: #181c22;
@@ -107,9 +108,9 @@
   --text-tertiary: #8490a0;
   --text-disabled: #b0bac7;
 
-  --border-subtle: rgba(0, 0, 0, 0.05);
-  --border-default: rgba(0, 0, 0, 0.09);
-  --border-hover: rgba(0, 0, 0, 0.16);
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-default: rgba(0, 0, 0, 0.10);
+  --border-hover: rgba(0, 0, 0, 0.18);
   --border-focus: var(--win-accent, #0078d4);
   --border-keycap: rgba(0, 0, 0, 0.1);
 
@@ -117,7 +118,7 @@
   --accent-hover: #1084d8;
   --accent-active: #006cbe;
   --accent-text: #ffffff;
-  --accent-subtle: var(--win-accent-subtle, rgba(0, 120, 212, 0.08));
+  --accent-subtle: var(--win-accent-subtle, rgba(0, 120, 212, 0.12));
 
   --status-success: #10b981;
   --status-success-bg: #d1fae5;
