@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { WorkspaceDTO, CreateWorkspaceInput, UpdateWorkspaceInput } from '../lib/types';
-import { desktopApi, onQuickSwitcherShow } from '../lib/desktop-api';
+import { desktopApi, onQuickSwitcherShow, onDashboardShow, onCaptureDesktopEvent } from '../lib/desktop-api';
 import { Sidebar, type NavTab } from '../components/Sidebar';
 import { OverviewView } from '../features/overview/OverviewView';
 import { WorkspacesView } from '../features/workspaces/WorkspacesView';
@@ -66,17 +66,34 @@ export const App: React.FC = () => {
     });
   }, []);
 
-  // Global shortcut listener from Rust (Ctrl+Space / Ctrl+Alt+Space)
+  // Global shortcut and Tray Event Listeners
   useEffect(() => {
-    let unlisten: (() => void) | null = null;
+    let unlistenShortcut: (() => void) | null = null;
+    let unlistenDashboard: (() => void) | null = null;
+    let unlistenCapture: (() => void) | null = null;
+
     onQuickSwitcherShow(() => {
       setIsQuickSwitcherOpen(true);
     }).then((fn) => {
-      unlisten = fn;
+      unlistenShortcut = fn;
+    });
+
+    onDashboardShow(() => {
+      setIsQuickSwitcherOpen(false);
+    }).then((fn) => {
+      unlistenDashboard = fn;
+    });
+
+    onCaptureDesktopEvent(() => {
+      handleCaptureCurrent();
+    }).then((fn) => {
+      unlistenCapture = fn;
     });
 
     return () => {
-      if (unlisten) unlisten();
+      if (unlistenShortcut) unlistenShortcut();
+      if (unlistenDashboard) unlistenDashboard();
+      if (unlistenCapture) unlistenCapture();
     };
   }, []);
 
@@ -234,6 +251,18 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleCloseQuickSwitcher = () => {
+    setIsQuickSwitcherOpen(false);
+    desktopApi.window.hide().catch(() => {});
+  };
+
+  const handleQuickLaunch = async (id: string) => {
+    await handleLaunch(id);
+    setTimeout(() => {
+      desktopApi.window.hide().catch(() => {});
+    }, 800);
+  };
+
   return (
     <div className={styles.appLayout}>
       <Sidebar currentTab={currentTab} onSelectTab={handleSelectTab} />
@@ -322,9 +351,12 @@ export const App: React.FC = () => {
       {/* Quick Switcher Floating Overlay (Section 6.6) */}
       <QuickSwitcher
         isOpen={isQuickSwitcherOpen}
-        onClose={() => setIsQuickSwitcherOpen(false)}
+        onClose={handleCloseQuickSwitcher}
         workspaces={workspaces}
-        onLaunch={handleLaunch}
+        onLaunch={handleQuickLaunch}
+        onOpenDashboard={() => {
+          setIsQuickSwitcherOpen(false);
+        }}
         onOpenNotes={() => {
           setSelectedWorkspaceId(null);
           setCurrentTab('workspaces');

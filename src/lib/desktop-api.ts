@@ -80,6 +80,10 @@ export const desktopApi = {
     getWindowsThemeColor: (): Promise<WindowsThemeColorDTO> =>
       invoke<WindowsThemeColorDTO>('settings_get_windows_theme_color'),
   },
+  window: {
+    hide: (): Promise<void> => invoke<void>('window_hide'),
+    show: (): Promise<void> => invoke<void>('window_show'),
+  },
 };
 
 export async function onLaunchProgress(
@@ -94,4 +98,16 @@ export async function onQuickSwitcherShow(
   handler: () => void
 ): Promise<UnlistenFn> {
   return listen('quick-switcher:show', () => handler());
+}
+
+export async function onDashboardShow(
+  handler: () => void
+): Promise<UnlistenFn> {
+  return listen('dashboard:show', () => handler());
+}
+
+export async function onCaptureDesktopEvent(
+  handler: () => void
+): Promise<UnlistenFn> {
+  return listen('workspace:capture-desktop', () => handler());
 }

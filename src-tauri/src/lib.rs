@@ -5,6 +5,8 @@ pub mod models;
 pub mod services;
 
 use tauri::{Emitter, Manager};
+use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
+use tauri::tray::{TrayIconBuilder, TrayIconEvent, MouseButton, MouseButtonState};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -46,6 +48,73 @@ pub fn run() {
                 }
             }
 
+            // Create System Tray with Quick Actions (matching design mockup)
+            let launcher_item = MenuItem::with_id(app, "launcher", "Quick Launcher (Ctrl+Space)", true, None::<&str>)?;
+            let capture_item = MenuItem::with_id(app, "capture", "Capture Desktop (Ctrl+Shift+C)", true, None::<&str>)?;
+            let dashboard_item = MenuItem::with_id(app, "dashboard", "Open Dashboard", true, None::<&str>)?;
+            let sep = PredefinedMenuItem::separator(app)?;
+            let quit_item = MenuItem::with_id(app, "quit", "Quit DeskPilot", true, None::<&str>)?;
+
+            let menu = Menu::with_items(app, &[&launcher_item, &capture_item, &dashboard_item, &sep, &quit_item])?;
+
+            let mut tray_builder = TrayIconBuilder::new()
+                .menu(&menu)
+                .tooltip("DeskPilot Quick Launcher")
+                .show_menu_on_left_click(false)
+                .on_menu_event(|app, event| {
+                    match event.id.as_ref() {
+                        "launcher" => {
+                            if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.show();
+                                let _ = window.unminimize();
+                                let _ = window.set_focus();
+                                let _ = window.emit("quick-switcher:show", ());
+                            }
+                        }
+                        "capture" => {
+                            if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.show();
+                                let _ = window.unminimize();
+                                let _ = window.set_focus();
+                                let _ = window.emit("workspace:capture-desktop", ());
+                            }
+                        }
+                        "dashboard" => {
+                            if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.show();
+                                let _ = window.unminimize();
+                                let _ = window.set_focus();
+                                let _ = window.emit("dashboard:show", ());
+                            }
+                        }
+                        "quit" => {
+                            app.exit(0);
+                        }
+                        _ => {}
+                    }
+                })
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, .. } = event {
+                        let app = tray.app_handle();
+                        if let Some(window) = app.get_webview_window("main") {
+                            if window.is_visible().unwrap_or(false) {
+                                let _ = window.hide();
+                            } else {
+                                let _ = window.show();
+                                let _ = window.unminimize();
+                                let _ = window.set_focus();
+                                let _ = window.emit("quick-switcher:show", ());
+                            }
+                        }
+                    }
+                });
+
+            if let Some(icon) = app.default_window_icon() {
+                tray_builder = tray_builder.icon(icon.clone());
+            }
+
+            let _ = tray_builder.build(app)?;
+
             // Register default global shortcut Ctrl+Space (or Ctrl+Alt+Space fallback)
             let shortcut_res = "ctrl+space".parse::<Shortcut>();
             let shortcut = match shortcut_res {
@@ -82,6 +151,12 @@ pub fn run() {
 
             Ok(())
         })
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                let _ = window.hide();
+                api.prevent_close();
+            }
+        })
         .invoke_handler(tauri::generate_handler![
             commands::workspace::workspace_list,
             commands::workspace::workspace_get,
@@ -109,6 +184,8 @@ pub fn run() {
             commands::settings::settings_update,
             commands::settings::settings_open_data_folder,
             commands::settings::settings_get_windows_theme_color,
+            commands::window::window_hide,
+            commands::window::window_show,
         ])
         .run(tauri::generate_context!())
         .expect("error while running DeskPilot application");

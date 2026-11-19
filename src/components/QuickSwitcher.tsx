@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Search, Star, Layers, Code2, GraduationCap, Briefcase, Play, Settings, FileText, Camera } from 'lucide-react';
+import { Search, Star, Layers, Code2, GraduationCap, Briefcase, Play, Settings, FileText, Camera, LayoutDashboard } from 'lucide-react';
 import type { WorkspaceDTO } from '../lib/types';
 import styles from './QuickSwitcher.module.css';
 
@@ -10,6 +10,7 @@ interface QuickSwitcherProps {
   onLaunch: (id: string) => void;
   onOpenNotes?: () => void;
   onOpenSettings?: () => void;
+  onOpenDashboard?: () => void;
   onCaptureCurrent?: () => void;
 }
 
@@ -20,6 +21,7 @@ export const QuickSwitcher: React.FC<QuickSwitcherProps> = ({
   onLaunch,
   onOpenNotes,
   onOpenSettings,
+  onOpenDashboard,
   onCaptureCurrent,
 }) => {
   const [query, setQuery] = useState('');
@@ -217,6 +219,19 @@ export const QuickSwitcher: React.FC<QuickSwitcherProps> = ({
               <Settings size={14} className={styles.actionIcon} />
               <span className={styles.actionLabel}>Open Settings</span>
               <span className={styles.actionBadge}>Ctrl + ,</span>
+            </button>
+          )}
+
+          {onOpenDashboard && (
+            <button
+              className={styles.actionRow}
+              onClick={() => {
+                onOpenDashboard();
+              }}
+            >
+              <LayoutDashboard size={14} className={styles.actionIcon} />
+              <span className={styles.actionLabel}>Open Full Dashboard</span>
+              <span className={styles.actionBadge}>Ctrl + D</span>
             </button>
           )}
         </div>
