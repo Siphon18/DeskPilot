@@ -1,8 +1,8 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  max-width: 1000px;
+  gap: var(--space-5);
+  max-width: 1040px;
 }
 
 .header {
@@ -18,36 +18,36 @@
 }
 
 .title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #f8fafc;
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .subtitle {
-  font-size: 13.5px;
-  color: #94a3b8;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
   margin: 0;
 }
 
 .saveBtn {
-  height: 36px;
+  height: var(--control-height);
   padding: 0 16px;
-  background: #2563eb;
+  background-color: var(--accent-primary);
   color: #ffffff;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   border: none;
-  font-weight: 600;
-  font-size: 13px;
+  font-weight: 500;
+  font-size: var(--font-size-sm);
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  transition: all 120ms ease;
+  transition: background-color var(--transition-fast);
 }
 
 .saveBtn:hover:not(:disabled) {
-  background: #1d4ed8;
+  background-color: var(--accent-hover);
 }
 
 .saveBtn:disabled {
@@ -58,7 +58,7 @@
 .contentLayout {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .workspaceSelector {
@@ -69,8 +69,8 @@
 }
 
 .selectorLabel {
-  font-size: 13px;
-  color: #94a3b8;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
@@ -85,33 +85,33 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  border-radius: 8px;
-  background: #181c28;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #94a3b8;
-  font-size: 13px;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
   cursor: pointer;
-  transition: all 120ms ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .pill:hover {
-  background: #202636;
-  color: #f8fafc;
+  background-color: var(--bg-card-hover);
+  color: var(--text-primary);
 }
 
 .pillActive {
-  background: rgba(37, 99, 235, 0.2) !important;
-  border-color: #3b82f6 !important;
-  color: #60a5fa !important;
-  font-weight: 600;
+  background-color: var(--accent-subtle) !important;
+  border-color: var(--accent-primary) !important;
+  color: var(--text-primary) !important;
+  font-weight: 500;
 }
 
 .editorArea {
-  background: #181c28;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
   padding: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-card);
 }
 
 .textarea {
@@ -119,13 +119,13 @@
   background: transparent;
   border: none;
   outline: none;
-  color: #f8fafc;
-  font-family: 'Consolas', 'Cascadia Code', monospace;
-  font-size: 13.5px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
   line-height: 1.6;
   resize: vertical;
 }
 
 .textarea::placeholder {
-  color: #64748b;
+  color: var(--text-tertiary);
 }

@@ -2,87 +2,61 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
-  max-width: 1100px;
+  max-width: 1140px;
+  width: 100%;
 }
 
-/* Header Row (Section 6.6) */
-.header {
+/* 1. Hero Banner (Windows 11 Fluent Acrylic Graphic) */
+.heroBanner {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
+  background: linear-gradient(135deg, rgba(28, 36, 50, 0.75) 0%, rgba(18, 23, 33, 0.9) 100%);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
+  padding: 20px 28px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
 }
 
-.headingArea {
+.heroContent {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  z-index: 1;
 }
 
-.title {
-  font-size: var(--font-size-xl);
+.heroTitle {
+  font-size: var(--font-size-2xl);
   font-weight: 600;
   letter-spacing: -0.3px;
   color: var(--text-primary);
   margin: 0;
 }
 
-.subtitle {
-  font-size: var(--font-size-sm);
+.heroSubtitle {
+  font-size: var(--font-size-base);
   color: var(--text-secondary);
   margin: 0;
 }
 
-.headerActions {
+.heroGraphic {
+  width: 240px;
+  height: 100px;
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  justify-content: flex-end;
+  pointer-events: none;
 }
 
-.primaryBtn {
-  height: var(--control-height-lg);
-  padding: 0 16px;
-  background: var(--accent-primary);
-  color: #ffffff;
-  border-radius: var(--radius-sm);
-  border: none;
-  font-weight: 500;
-  font-size: var(--font-size-sm);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+.heroSvg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
-.primaryBtn:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-}
-
-.secondaryBtn {
-  height: var(--control-height-lg);
-  padding: 0 14px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-default);
-  color: var(--text-primary);
-  border-radius: var(--radius-sm);
-  font-weight: 500;
-  font-size: var(--font-size-sm);
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.secondaryBtn:hover {
-  background: var(--bg-card-hover);
-  border-color: var(--border-hover);
-}
-
-/* Sections */
+/* 2. Sections */
 .section {
   display: flex;
   flex-direction: column;
@@ -93,132 +67,152 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 36px;
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .sectionTitle {
   font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
   margin: 0;
 }
 
-.sectionIcon {
-  color: var(--text-secondary);
-}
-
-.counterBadge {
-  font-size: var(--font-size-xs);
-  font-weight: 500;
-  color: var(--text-secondary);
-  background: var(--bg-subtle);
-  padding: 1px 7px;
-  border-radius: 10px;
-}
-
-.viewHistoryLink {
-  background: none;
-  border: none;
-  font-size: var(--font-size-xs);
-  font-weight: 500;
-  color: var(--accent-primary);
-  cursor: pointer;
-  padding: 2px 4px;
-  display: inline-flex;
+.headerActions {
+  display: flex;
   align-items: center;
-  gap: 4px;
-  transition: color var(--transition-fast);
+  gap: 8px;
 }
 
-.viewHistoryLink:hover {
-  text-decoration: underline;
+.primaryBtn {
+  height: var(--control-height);
+  padding: 0 14px;
+  background-color: var(--accent-primary);
+  color: #ffffff;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
 }
 
-/* Two-column grid by default (Section 6.6) */
-.grid {
+.primaryBtn:hover {
+  background-color: var(--accent-hover);
+}
+
+.primaryBtn:active {
+  background-color: var(--accent-active);
+}
+
+.secondaryBtn {
+  height: var(--control-height);
+  padding: 0 12px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.secondaryBtn:hover {
+  background-color: var(--bg-card-hover);
+  border-color: var(--border-hover);
+}
+
+/* 3-column Workspaces Grid matching image 1 */
+.workspaceGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--space-4);
 }
 
-@media (min-width: 1100px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
+@media (max-width: 1100px) {
+  .workspaceGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 720px) {
-  .grid {
+  .workspaceGrid {
     grid-template-columns: 1fr;
   }
 }
 
-/* Quick Actions Row (Mockup Reference) */
+/* 3. Quick Actions Grid */
 .quickActionsGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--space-3);
 }
 
-@media (max-width: 860px) {
+@media (max-width: 900px) {
   .quickActionsGrid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 .quickActionCard {
-  background: var(--bg-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background-color: var(--bg-card);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   padding: 12px 14px;
   display: flex;
   align-items: center;
   gap: 12px;
   cursor: pointer;
-  transition: all var(--transition-fast);
-  box-shadow: var(--shadow-card);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
   text-align: left;
+  user-select: none;
 }
 
 .quickActionCard:hover {
-  background: var(--bg-card-hover);
+  background-color: var(--bg-card-hover);
   border-color: var(--border-hover);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  transform: translateY(-1px);
 }
 
 .quickActionIcon {
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.quickActionIconZap {
-  background: rgba(245, 158, 11, 0.16);
-  color: #fbbf24;
+.iconZap {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
 }
 
-.quickActionIconCamera {
-  background: rgba(59, 130, 246, 0.16);
-  color: #60a5fa;
+.iconNotes {
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
 }
 
-.quickActionIconPlus {
-  background: var(--accent-subtle);
-  color: var(--accent-primary);
+.iconCapture {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
 }
 
-.quickActionIconSettings {
-  background: rgba(168, 85, 247, 0.16);
-  color: #c084fc;
+.iconSettings {
+  background: rgba(148, 163, 184, 0.14);
+  color: #94a3b8;
 }
 
 .quickActionText {
@@ -229,7 +223,7 @@
 }
 
 .quickActionTitle {
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   color: var(--text-primary);
   white-space: nowrap;
@@ -238,11 +232,30 @@
 }
 
 .quickActionShortcut {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono);
   color: var(--text-tertiary);
 }
 
-/* Recent Activity List (Backed strictly by SQLite launch runs) */
+/* 4. Recent Activity List */
+.viewHistoryLink {
+  background: none;
+  border: none;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--accent-primary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: opacity var(--transition-fast);
+}
+
+.viewHistoryLink:hover {
+  opacity: 0.85;
+  text-decoration: underline;
+}
+
 .recentList {
   display: flex;
   flex-direction: column;
@@ -255,21 +268,29 @@
   justify-content: space-between;
   padding: 10px 14px;
   border-radius: var(--radius-sm);
-  background: var(--bg-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background-color: var(--bg-card);
   border: 1px solid var(--border-default);
-  box-shadow: var(--shadow-card);
-  transition: all var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 
 .recentRow:hover {
-  background: var(--bg-card-hover);
+  background-color: var(--bg-card-hover);
   border-color: var(--border-hover);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .recentInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.recentGlyph {
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+}
+
+.recentDetails {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -292,36 +313,36 @@
   gap: 5px;
   font-size: var(--font-size-xs);
   color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
 }
 
-/* Empty State (Section 6.6) */
+/* Empty State */
 .emptyState {
-  background: var(--bg-card);
+  background-color: var(--bg-card);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  padding: 36px 28px;
+  border-radius: var(--radius-card);
+  padding: 32px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: var(--space-3);
-  max-width: 560px;
-  margin: 40px auto 0;
+  gap: var(--space-2);
 }
 
 .emptyIconBox {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-md);
-  background: var(--bg-subtle);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle-hover);
   color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 4px;
 }
 
 .emptyTitle {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
@@ -330,14 +351,13 @@
 .emptyText {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
-  line-height: 1.5;
   margin: 0;
-  max-width: 440px;
+  max-width: 420px;
 }
 
 .emptyActions {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
+  gap: 8px;
+  margin-top: 10px;
 }

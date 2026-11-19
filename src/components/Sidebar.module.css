@@ -1,14 +1,12 @@
 .sidebar {
-  width: var(--sidebar-width);
+  width: var(--sidebar-width, 220px);
   height: 100%;
   background-color: var(--bg-sidebar);
-  backdrop-filter: var(--liquid-blur);
-  -webkit-backdrop-filter: var(--liquid-blur);
-  border-right: 1px solid var(--border-default);
+  border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  padding: 16px 10px;
+  padding: 16px 12px;
   user-select: none;
 }
 
@@ -16,14 +14,13 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 10px 20px;
-  margin-bottom: 4px;
+  padding: 4px 8px 18px;
 }
 
 .brandMark {
-  width: 26px;
-  height: 26px;
-  border-radius: var(--radius-sm);
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-xs);
   background: var(--accent-primary);
   color: #ffffff;
   display: flex;
@@ -41,7 +38,7 @@
 .nav {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   flex: 1;
 }
 
@@ -50,11 +47,12 @@
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
+  height: 36px;
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   font-size: var(--font-size-base);
   font-weight: 400;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast);
   text-align: left;
   width: 100%;
   border: none;
@@ -64,48 +62,83 @@
 }
 
 .navItem:hover {
-  background-color: var(--bg-subtle);
+  background-color: var(--bg-subtle-hover);
   color: var(--text-primary);
 }
 
-/* Active navigation item: quiet tinted surface and narrow accent marker */
+/* Active navigation item: crisp solid accent fill or high-contrast pill */
 .navItemActive {
-  background: var(--accent-subtle) !important;
-  color: var(--accent-primary) !important;
+  background-color: var(--accent-primary) !important;
+  color: #ffffff !important;
   font-weight: 500;
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.14), 0 2px 8px rgba(var(--win-accent-rgb), 0.15);
 }
 
-.navItemActive::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 6px;
-  bottom: 6px;
-  width: 3px;
-  border-radius: 2px;
-  background-color: var(--accent-primary);
+.countBadge {
+  margin-left: auto;
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  color: inherit;
 }
 
 .footer {
   margin-top: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding-top: 12px;
+  gap: 10px;
+  padding-top: 14px;
   border-top: 1px solid var(--border-subtle);
 }
 
-.statusLine {
+.statusCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statusIndicator {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--status-success);
+  flex-shrink: 0;
+}
+
+.statusTitle {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.statusText {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  margin: 0;
+  line-height: 1.35;
+}
+
+.storageInfo {
   display: flex;
   align-items: center;
   gap: 6px;
+  padding: 0 4px;
   font-size: var(--font-size-xs);
   color: var(--text-tertiary);
-  padding: 4px 10px;
 }
 
-.statusIcon {
-  color: var(--text-tertiary);
-  flex-shrink: 0;
+.shieldIcon {
+  color: var(--status-success);
 }

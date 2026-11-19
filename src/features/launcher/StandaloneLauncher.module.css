@@ -12,12 +12,12 @@
 .card {
   width: 100%;
   height: 100%;
-  background: rgba(26, 31, 40, 0.94);
-  backdrop-filter: blur(28px) saturate(160%);
-  -webkit-backdrop-filter: blur(28px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 10px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+  background-color: var(--bg-window, rgba(20, 25, 34, 0.94));
+  backdrop-filter: var(--liquid-blur);
+  -webkit-backdrop-filter: var(--liquid-blur);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-window, 12px);
+  box-shadow: var(--shadow-window);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -25,12 +25,13 @@
 }
 
 .searchHeader {
+  height: 48px;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(30, 36, 46, 0.6);
+  padding: 0 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.02);
   cursor: default;
 }
 
@@ -44,7 +45,7 @@
   background: transparent;
   border: none;
   outline: none;
-  font-size: 13.5px;
+  font-size: var(--font-size-base);
   font-weight: 400;
   color: var(--text-primary);
   font-family: inherit;
@@ -55,20 +56,21 @@
 }
 
 .shortcutBadge {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono);
   font-weight: 500;
-  color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-tertiary);
+  background: var(--bg-keycap);
+  border: 1px solid var(--border-keycap);
   padding: 2px 7px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   letter-spacing: 0.1px;
 }
 
 .closeBtn {
   width: 26px;
   height: 26px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   border: none;
   background: transparent;
   color: var(--text-tertiary);
@@ -76,7 +78,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 100ms ease, color 100ms ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .closeBtn:hover {
@@ -85,43 +87,49 @@
 }
 
 .resultsList {
-  padding: 6px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   flex: 1;
   overflow-y: auto;
 }
 
 .emptyState {
-  padding: 24px 16px;
+  padding: 32px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   text-align: center;
   color: var(--text-tertiary);
   font-size: var(--font-size-sm);
+}
+
+.emptyIcon {
+  color: var(--text-disabled);
 }
 
 .resultRow {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 10px;
-  border-radius: 6px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
   background: transparent;
-  border: 1px solid transparent;
   cursor: pointer;
-  transition: all 120ms ease-out;
+  transition: background-color var(--transition-fast);
   user-select: none;
   position: relative;
 }
 
 .resultRow:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--bg-subtle-hover);
 }
 
-/* Active selected row: subtle Windows 11 highlight with quiet left accent bar */
+/* Active selected row: authentic Windows 11 Acrylic selection */
 .resultRowActive {
-  background: rgba(255, 255, 255, 0.07) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: var(--bg-card-active, rgba(255, 255, 255, 0.08)) !important;
 }
 
 .resultRowActive::before {
@@ -131,14 +139,14 @@
   top: 8px;
   bottom: 8px;
   width: 3px;
-  border-radius: 2px;
+  border-radius: 0 2px 2px 0;
   background-color: var(--accent-primary);
 }
 
 .iconBox {
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -146,23 +154,23 @@
 }
 
 .iconDev {
-  background: rgba(59, 130, 246, 0.14);
+  background: rgba(59, 130, 246, 0.12);
   color: #60a5fa;
 }
 
 .iconStudy {
-  background: rgba(168, 85, 247, 0.14);
+  background: rgba(168, 85, 247, 0.12);
   color: #c084fc;
 }
 
 .iconWork {
-  background: rgba(34, 197, 94, 0.14);
-  color: #4ade80;
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
 }
 
 .iconDefault {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
+  background: var(--accent-subtle);
+  color: var(--accent-primary);
 }
 
 .itemInfo {
@@ -170,7 +178,7 @@
   flex-direction: column;
   flex: 1;
   min-width: 0;
-  gap: 1px;
+  gap: 2px;
 }
 
 .titleLine {
@@ -180,7 +188,7 @@
 }
 
 .itemName {
-  font-size: 13.5px;
+  font-size: var(--font-size-base);
   font-weight: 500;
   color: var(--text-primary);
   white-space: nowrap;
@@ -189,7 +197,7 @@
 }
 
 .itemDesc {
-  font-size: 11.5px;
+  font-size: var(--font-size-xs);
   color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
@@ -204,33 +212,32 @@
 }
 
 .playBtn {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  background: var(--bg-subtle);
   color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 120ms ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
 
 .resultRowActive .playBtn,
 .playBtn:hover {
-  background: var(--accent-primary);
+  background-color: var(--accent-primary);
   color: #ffffff;
-  border-color: var(--accent-primary);
-  transform: scale(1.06);
+  transform: scale(1.05);
 }
 
 .quickActionsSection {
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 4px 6px;
+  border-top: 1px solid var(--border-subtle);
+  padding: 6px 8px;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   background: rgba(0, 0, 0, 0.08);
 }
 
@@ -239,20 +246,21 @@
   align-items: center;
   gap: 10px;
   padding: 6px 10px;
-  border-radius: 5px;
+  border-radius: var(--radius-xs);
   background: transparent;
   border: none;
-  color: var(--text-primary);
-  font-size: 12.5px;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
   font-weight: 400;
   cursor: pointer;
-  transition: background 100ms ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
   text-align: left;
   width: 100%;
 }
 
 .actionRow:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-subtle-hover);
+  color: var(--text-primary);
 }
 
 .actionIcon {
@@ -265,11 +273,13 @@
 }
 
 .actionBadge {
-  font-size: 10.5px;
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono);
   color: var(--text-tertiary);
-  background: rgba(255, 255, 255, 0.05);
-  padding: 1px 5px;
-  border-radius: 3px;
+  background: var(--bg-keycap);
+  border: 1px solid var(--border-keycap);
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
 }
 
 .footer {
@@ -277,9 +287,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 14px;
-  background: rgba(20, 24, 32, 0.7);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 11px;
+  background-color: var(--bg-sidebar);
+  border-top: 1px solid var(--border-subtle);
+  font-size: var(--font-size-xs);
   color: var(--text-tertiary);
   cursor: default;
 }
@@ -296,10 +306,10 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent-primary);
+  background-color: var(--accent-primary);
 }
 
 .closeHint {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   color: var(--text-tertiary);
 }

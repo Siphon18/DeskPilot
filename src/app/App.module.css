@@ -4,15 +4,12 @@
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: 
-    var(--liquid-aura-primary),
-    var(--liquid-aura-secondary),
-    var(--bg-app);
+  background: var(--bg-window);
   backdrop-filter: var(--liquid-blur);
   -webkit-backdrop-filter: var(--liquid-blur);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-dialog);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+  border-radius: var(--radius-window);
+  box-shadow: var(--shadow-window);
 }
 
 .appLayout {
@@ -27,10 +24,11 @@
   flex: 1;
   height: 100%;
   overflow-y: auto;
-  padding: 24px 28px;
+  padding: 24px 32px;
   min-width: 0;
   display: flex;
   flex-direction: column;
+  background: var(--bg-app);
 }
 
 @media (max-width: 960px) {
@@ -51,9 +49,9 @@
 }
 
 .spinner {
-  width: 28px;
-  height: 28px;
-  border: 2.5px solid var(--border-default);
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--border-default);
   border-top-color: var(--accent-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;

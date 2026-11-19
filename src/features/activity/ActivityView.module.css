@@ -44,7 +44,6 @@
 .runRow:hover {
   border-color: var(--border-hover);
   background: var(--bg-card-hover);
-  transform: translateY(-1px);
 }
 
 .runMain {

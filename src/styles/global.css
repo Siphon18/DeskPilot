@@ -46,16 +46,16 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Accessible focus ring */
+/* Accessible focus ring without neon glow */
 :focus-visible {
   outline: 2px solid var(--border-focus);
-  outline-offset: 2px;
+  outline-offset: 1px;
 }
 
-/* Custom scrollbars */
+/* Windows 11 style subtle scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -63,10 +63,10 @@ a:hover {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-default);
-  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-tertiary);
+  background: rgba(255, 255, 255, 0.22);
 }

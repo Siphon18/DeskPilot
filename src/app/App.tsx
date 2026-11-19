@@ -7,6 +7,8 @@ import { WorkspacesView } from '../features/workspaces/WorkspacesView';
 import { WorkspaceDetailView } from '../features/workspaces/WorkspaceDetailView';
 import { ActivityView } from '../features/activity/ActivityView';
 import { SettingsView } from '../features/settings/SettingsView';
+import { QuickNotesView } from '../features/notes/QuickNotesView';
+import { AboutView } from '../features/about/AboutView';
 import { WindowHeader } from '../components/WindowHeader';
 import { WorkspaceModal } from '../components/WorkspaceModal';
 import { DeleteModal } from '../components/DeleteModal';
@@ -268,7 +270,11 @@ export const App: React.FC = () => {
     <div className={styles.appShell}>
       <WindowHeader title="DeskPilot Settings & Workspaces" showBrand={true} />
       <div className={styles.appLayout}>
-        <Sidebar currentTab={currentTab} onSelectTab={handleSelectTab} />
+        <Sidebar
+          currentTab={currentTab}
+          onSelectTab={handleSelectTab}
+          workspaceCount={workspaces.length}
+        />
 
         <main className={styles.mainContent}>
         {isLoading ? (
@@ -315,12 +321,20 @@ export const App: React.FC = () => {
               />
             )}
 
+            {currentTab === 'notes' && (
+              <QuickNotesView workspaces={workspaces} />
+            )}
+
             {currentTab === 'activity' && (
               <ActivityView />
             )}
 
             {currentTab === 'settings' && (
               <SettingsView currentTheme={theme} onThemeChange={setTheme} />
+            )}
+
+            {currentTab === 'about' && (
+              <AboutView />
             )}
           </>
         )}

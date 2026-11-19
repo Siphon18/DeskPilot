@@ -9,6 +9,7 @@ import {
   Play,
   Settings,
   Camera,
+  FileText,
   X,
 } from 'lucide-react';
 import type { WorkspaceDTO } from '../../lib/types';
@@ -28,7 +29,7 @@ export const StandaloneLauncher: React.FC = () => {
       const data = await desktopApi.workspaces.list();
       setWorkspaces(data);
     } catch {
-      // silently fallback
+      // fallback
     }
   };
 
@@ -36,14 +37,20 @@ export const StandaloneLauncher: React.FC = () => {
     loadWorkspaces();
     setTimeout(() => inputRef.current?.focus(), 40);
 
-    // Dynamic accent color from Windows Registry
-    desktopApi.settings.getWindowsThemeColor().then((color) => {
-      const root = document.documentElement;
-      root.style.setProperty('--win-accent', color.hex);
-      root.style.setProperty('--win-accent-rgb', `${color.r}, ${color.g}, ${color.b}`);
-      root.style.setProperty('--win-accent-subtle', color.accentSubtle);
-      root.style.setProperty('--win-accent-border', `rgba(${color.r}, ${color.g}, ${color.b}, 0.25)`);
-    }).catch(() => {});
+    // Sync Windows active accent color from Registry
+    desktopApi.settings
+      .getWindowsThemeColor()
+      .then((color) => {
+        const root = document.documentElement;
+        root.style.setProperty('--win-accent', color.hex);
+        root.style.setProperty('--win-accent-rgb', `${color.r}, ${color.g}, ${color.b}`);
+        root.style.setProperty('--win-accent-subtle', color.accentSubtle);
+        root.style.setProperty(
+          '--win-accent-border',
+          `rgba(${color.r}, ${color.g}, ${color.b}, 0.25)`
+        );
+      })
+      .catch(() => {});
   }, []);
 
   const filtered = useMemo(() => {
@@ -99,6 +106,16 @@ export const StandaloneLauncher: React.FC = () => {
   const handleOpenSettings = async () => {
     try {
       await desktopApi.window.openMainDashboard();
+      handleClose();
+    } catch {
+      // fallback
+    }
+  };
+
+  const handleOpenNotes = async () => {
+    try {
+      await desktopApi.window.openMainDashboard();
+      handleClose();
     } catch {
       // fallback
     }
@@ -159,7 +176,7 @@ export const StandaloneLauncher: React.FC = () => {
           data-tauri-drag-region
           onMouseDown={handleHeaderMouseDown}
         >
-          <Search size={15} className={styles.searchIcon} data-tauri-drag-region />
+          <Search size={15} strokeWidth={2} className={styles.searchIcon} data-tauri-drag-region />
           <input
             ref={inputRef}
             type="text"
@@ -176,14 +193,17 @@ export const StandaloneLauncher: React.FC = () => {
             title="Close (Esc)"
             aria-label="Close"
           >
-            <X size={14} />
+            <X size={14} strokeWidth={2} />
           </button>
         </div>
 
         {/* Workspace result list */}
         <div className={styles.resultsList}>
           {filtered.length === 0 ? (
-            <div className={styles.emptyState}>No workspaces match "{query}"</div>
+            <div className={styles.emptyState}>
+              <Layers size={20} strokeWidth={1.5} className={styles.emptyIcon} />
+              <span>No workspaces match "{query}"</span>
+            </div>
           ) : (
             filtered.map((ws, idx) => {
               const isSelected = idx === selectedIndex;
@@ -230,23 +250,33 @@ export const StandaloneLauncher: React.FC = () => {
           )}
         </div>
 
-        {/* Quick Utility Actions */}
+        {/* Quick Utility Actions (Mockup: Quick Notes, Settings, Capture) */}
         <div className={styles.quickActionsSection}>
+          <button className={styles.actionRow} onClick={handleOpenNotes}>
+            <FileText size={14} strokeWidth={1.8} className={styles.actionIcon} />
+            <span className={styles.actionLabel}>Open Quick Notes</span>
+            <span className={styles.actionBadge}>Ctrl + N</span>
+          </button>
+
           <button className={styles.actionRow} onClick={handleCaptureDesktop}>
-            <Camera size={14} className={styles.actionIcon} />
+            <Camera size={14} strokeWidth={1.8} className={styles.actionIcon} />
             <span className={styles.actionLabel}>Capture Desktop Workspace</span>
             <span className={styles.actionBadge}>Ctrl + Shift + C</span>
           </button>
 
           <button className={styles.actionRow} onClick={handleOpenSettings}>
-            <Settings size={14} className={styles.actionIcon} />
-            <span className={styles.actionLabel}>Settings & Full Dashboard</span>
-            <span className={styles.actionBadge}>Settings</span>
+            <Settings size={14} strokeWidth={1.8} className={styles.actionIcon} />
+            <span className={styles.actionLabel}>Open Settings & Workspaces</span>
+            <span className={styles.actionBadge}>Ctrl + ,</span>
           </button>
         </div>
 
-        {/* Footer shortcuts hint */}
-        <div className={styles.footer} data-tauri-drag-region onMouseDown={handleHeaderMouseDown}>
+        {/* Footer */}
+        <div
+          className={styles.footer}
+          data-tauri-drag-region
+          onMouseDown={handleHeaderMouseDown}
+        >
           <div className={styles.brandTag} data-tauri-drag-region>
             <span className={styles.brandDot} />
             <span data-tauri-drag-region>DeskPilot</span>
