@@ -52,6 +52,21 @@ export const App: React.FC = () => {
     loadWorkspaces();
   }, [loadWorkspaces]);
 
+  // Fetch and apply Windows active theme color dynamically
+  useEffect(() => {
+    desktopApi.settings.getWindowsThemeColor().then((color) => {
+      const root = document.documentElement;
+      root.style.setProperty('--win-accent', color.hex);
+      root.style.setProperty('--win-accent-rgb', `${color.r}, ${color.g}, ${color.b}`);
+      root.style.setProperty('--win-accent-glow', color.accentGlow);
+      root.style.setProperty('--win-accent-subtle', color.accentSubtle);
+      root.style.setProperty('--win-accent-highlight', color.liquidHighlight);
+      root.style.setProperty('--win-accent-border', `rgba(${color.r}, ${color.g}, ${color.b}, 0.35)`);
+    }).catch((err) => {
+      console.warn('Could not query Windows theme color:', err);
+    });
+  }, []);
+
   // Global shortcut listener from Rust (Ctrl+Space / Ctrl+Alt+Space)
   useEffect(() => {
     let unlisten: (() => void) | null = null;
@@ -196,6 +211,13 @@ export const App: React.FC = () => {
 
   return (
     <div className={styles.appLayout}>
+      {/* Liquid Ambient Mesh Backdrop blending with Windows Active Theme */}
+      <div className={styles.liquidMeshContainer} aria-hidden="true">
+        <div className={styles.liquidOrb1} />
+        <div className={styles.liquidOrb2} />
+        <div className={styles.liquidOrb3} />
+      </div>
+
       <Sidebar currentTab={currentTab} onSelectTab={handleSelectTab} />
 
       <main className={styles.mainContent}>

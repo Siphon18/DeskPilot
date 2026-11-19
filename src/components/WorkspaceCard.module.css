@@ -1,23 +1,30 @@
 .card {
-  background: #181c28;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--liquid-glass-bg);
+  backdrop-filter: var(--liquid-blur);
+  -webkit-backdrop-filter: var(--liquid-blur);
+  border: var(--liquid-glass-border);
   border-radius: 14px;
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   position: relative;
-  transition: all 140ms ease;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: all var(--transition-normal);
+  box-shadow: var(--liquid-glass-specular), var(--liquid-glass-shadow);
   cursor: pointer;
   user-select: none;
 }
 
 .card:hover {
-  background: #1e2433;
-  border-color: rgba(255, 255, 255, 0.16);
+  background: linear-gradient(
+    135deg,
+    rgba(32, 38, 56, 0.85) 0%,
+    rgba(var(--win-accent-rgb), 0.14) 50%,
+    rgba(22, 28, 42, 0.92) 100%
+  );
+  border-color: rgba(var(--win-accent-rgb), 0.45);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--liquid-glass-specular), var(--liquid-glass-shadow-hover);
 }
 
 .cardHeader {
@@ -121,20 +128,20 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #2563eb;
+  background: var(--win-accent, #2563eb);
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 140ms ease;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.45);
+  box-shadow: 0 4px 14px var(--win-accent-glow), inset 0 1px 1px rgba(255, 255, 255, 0.35);
 }
 
 .playButton:hover {
   transform: scale(1.12);
-  background: #1d4ed8;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.6);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 18px var(--win-accent-glow), inset 0 1px 1px rgba(255, 255, 255, 0.5);
 }
 
 .playButton:active {

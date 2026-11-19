@@ -22,41 +22,65 @@
   --sidebar-width: 224px;
   --control-height: 32px;
   --control-height-lg: 36px;
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
 
   /* Transitions */
-  --transition-fast: 120ms cubic-bezier(0.1, 0.9, 0.2, 1);
-  --transition-normal: 160ms cubic-bezier(0.1, 0.9, 0.2, 1);
+  --transition-fast: 140ms cubic-bezier(0.1, 0.9, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.1, 0.9, 0.2, 1);
+  --transition-smooth: 320ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Active Windows Theme Accent Color (Default values, synced via Rust DWM API) */
+  --win-accent: #744da9;
+  --win-accent-rgb: 116, 77, 169;
+  --win-accent-glow: rgba(116, 77, 169, 0.45);
+  --win-accent-subtle: rgba(116, 77, 169, 0.15);
+  --win-accent-highlight: rgba(116, 77, 169, 0.28);
+  --win-accent-border: rgba(116, 77, 169, 0.35);
+
+  /* Liquid Glass Core Tokens */
+  --liquid-glass-bg: linear-gradient(
+    135deg,
+    rgba(24, 29, 43, 0.72) 0%,
+    rgba(var(--win-accent-rgb), 0.09) 50%,
+    rgba(16, 20, 31, 0.82) 100%
+  );
+  --liquid-glass-border: 1px solid rgba(255, 255, 255, 0.14);
+  --liquid-glass-border-hover: 1px solid rgba(255, 255, 255, 0.24);
+  --liquid-glass-specular: inset 0 1px 1px 0 rgba(255, 255, 255, 0.3), inset 0 0 14px 0 rgba(var(--win-accent-rgb), 0.1);
+  --liquid-glass-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 0 24px rgba(var(--win-accent-rgb), 0.14);
+  --liquid-glass-shadow-hover: 0 20px 54px rgba(0, 0, 0, 0.6), 0 0 32px rgba(var(--win-accent-rgb), 0.28);
+  --liquid-blur: blur(28px) saturate(190%);
 }
 
-/* Default Dark Fluent Theme (Windows 11 Inspired) */
+/* Default Dark Fluent Theme (Windows 11 Inspired with Liquid Glass) */
 :root, [data-theme="dark"] {
-  --bg-app: #0f131a;
-  --bg-sidebar: #131722;
-  --bg-card: #181c28;
-  --bg-card-hover: #202636;
-  --bg-subtle: #1a1f2e;
-  --bg-input: #141824;
-  --bg-modal: #171c29;
-  --bg-overlay: rgba(8, 11, 16, 0.7);
+  --bg-app: #0d1118;
+  --bg-sidebar: rgba(18, 22, 33, 0.85);
+  --bg-card: rgba(24, 29, 43, 0.75);
+  --bg-card-hover: rgba(32, 39, 56, 0.85);
+  --bg-subtle: rgba(26, 32, 48, 0.65);
+  --bg-input: rgba(19, 23, 35, 0.85);
+  --bg-modal: rgba(22, 27, 40, 0.94);
+  --bg-overlay: rgba(6, 9, 14, 0.65);
 
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-tertiary: #64748b;
   --text-disabled: #475569;
 
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.1);
-  --border-hover: rgba(255, 255, 255, 0.2);
-  --border-focus: #3b82f6;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.13);
+  --border-hover: rgba(255, 255, 255, 0.22);
+  --border-focus: var(--win-accent, #3b82f6);
 
-  --accent-primary: #2563eb;
-  --accent-hover: #1d4ed8;
-  --accent-active: #1e40af;
+  --accent-primary: var(--win-accent, #2563eb);
+  --accent-hover: var(--win-accent, #1d4ed8);
+  --accent-active: var(--win-accent, #1e40af);
   --accent-text: #ffffff;
-  --accent-subtle: rgba(37, 99, 235, 0.15);
+  --accent-subtle: var(--win-accent-subtle, rgba(37, 99, 235, 0.15));
 
   --status-success: #10b981;
   --status-success-bg: rgba(16, 185, 129, 0.15);
@@ -65,9 +89,9 @@
   --status-error: #ef4444;
   --status-error-bg: rgba(239, 68, 68, 0.15);
 
-  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.25);
-  --shadow-flyout: 0 12px 32px rgba(0, 0, 0, 0.45);
-  --shadow-modal: 0 24px 48px rgba(0, 0, 0, 0.6);
+  --shadow-card: var(--liquid-glass-shadow);
+  --shadow-flyout: 0 16px 40px rgba(0, 0, 0, 0.55), 0 0 28px rgba(var(--win-accent-rgb), 0.2);
+  --shadow-modal: 0 28px 64px rgba(0, 0, 0, 0.7), 0 0 40px rgba(var(--win-accent-rgb), 0.25);
 }
 
 /* Light Theme */

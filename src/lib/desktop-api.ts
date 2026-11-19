@@ -12,6 +12,7 @@ import type {
   LaunchProgressEvent,
   AppSettings,
   CapturedWindowApp,
+  WindowsThemeColorDTO,
 } from './types';
 
 export const desktopApi = {
@@ -76,6 +77,8 @@ export const desktopApi = {
       invoke<AppSettings>('settings_update', { settings }),
     openDataFolder: (): Promise<void> =>
       invoke<void>('settings_open_data_folder'),
+    getWindowsThemeColor: (): Promise<WindowsThemeColorDTO> =>
+      invoke<WindowsThemeColorDTO>('settings_get_windows_theme_color'),
   },
 };
 

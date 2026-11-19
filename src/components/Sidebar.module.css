@@ -2,12 +2,15 @@
   width: var(--sidebar-width);
   height: 100%;
   background-color: var(--bg-sidebar);
+  backdrop-filter: var(--liquid-blur);
+  -webkit-backdrop-filter: var(--liquid-blur);
   border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   padding: 20px 16px;
   user-select: none;
+  z-index: 1;
 }
 
 .brand {
@@ -22,11 +25,11 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background: linear-gradient(135deg, var(--win-accent, #3b82f6), #1d4ed8);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 4px 14px var(--win-accent-glow);
 }
 
 .brandIcon {
@@ -66,19 +69,19 @@
 }
 
 .navItem:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.06);
   color: #f8fafc;
 }
 
 .navItemActive {
-  background: #2563eb !important;
+  background: var(--win-accent, #2563eb) !important;
   color: #ffffff !important;
   font-weight: 600;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 4px 16px var(--win-accent-glow), inset 0 1px 1px rgba(255, 255, 255, 0.35) !important;
 }
 
 .navItemActive:hover {
-  background: #1d4ed8 !important;
+  filter: brightness(1.08);
   color: #ffffff !important;
 }
 
@@ -90,8 +93,11 @@
 }
 
 .statusCard {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(var(--win-accent-rgb), 0.05);
+  border: 1px solid rgba(var(--win-accent-rgb), 0.22);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.2);
   border-radius: 12px;
   padding: 12px 14px;
   display: flex;
@@ -110,7 +116,7 @@
   height: 8px;
   border-radius: 50%;
   background-color: #10b981;
-  box-shadow: 0 0 8px #10b981;
+  box-shadow: 0 0 10px #10b981;
 }
 
 .statusTitle {

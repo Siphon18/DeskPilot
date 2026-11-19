@@ -95,6 +95,7 @@ pub fn run() {
             commands::settings::settings_get,
             commands::settings::settings_update,
             commands::settings::settings_open_data_folder,
+            commands::settings::settings_get_windows_theme_color,
         ])
         .run(tauri::generate_context!())
         .expect("error while running DeskPilot application");

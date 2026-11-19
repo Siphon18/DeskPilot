@@ -22,12 +22,19 @@
 
 .panel {
   width: 360px;
-  background: rgba(20, 25, 36, 0.92);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(
+    145deg,
+    rgba(20, 25, 38, 0.88) 0%,
+    rgba(var(--win-accent-rgb), 0.14) 50%,
+    rgba(14, 18, 28, 0.94) 100%
+  );
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 18px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35),
+              0 24px 64px rgba(0, 0, 0, 0.7),
+              0 0 36px var(--win-accent-subtle, rgba(116, 77, 169, 0.2));
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -105,22 +112,24 @@
   gap: 12px;
   padding: 10px 12px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   cursor: pointer;
-  transition: all 120ms ease;
+  transition: all 130ms ease;
   user-select: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .workspaceCard:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(var(--win-accent-rgb), 0.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 16px var(--win-accent-subtle);
 }
 
 .workspaceCardActive {
-  background: #2563eb !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+  background: var(--win-accent, #2563eb) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 0 4px 18px var(--win-accent-glow), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
 }
 
 .iconBox {
@@ -266,8 +275,8 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #a855f7;
-  box-shadow: 0 0 6px #a855f7;
+  background: var(--win-accent, #a855f7);
+  box-shadow: 0 0 8px var(--win-accent, #a855f7);
 }
 
 .footerBrandText {

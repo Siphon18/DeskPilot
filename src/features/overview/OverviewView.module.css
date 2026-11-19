@@ -7,8 +7,15 @@
 
 /* Hero Banner */
 .heroBanner {
-  background: linear-gradient(135deg, #111a2e 0%, #172a4c 50%, #152238 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(
+    135deg,
+    rgba(17, 26, 46, 0.85) 0%,
+    rgba(var(--win-accent-rgb), 0.16) 50%,
+    rgba(21, 34, 56, 0.9) 100%
+  );
+  backdrop-filter: var(--liquid-blur);
+  -webkit-backdrop-filter: var(--liquid-blur);
+  border: var(--liquid-glass-border);
   border-radius: 16px;
   padding: 32px 36px;
   display: flex;
@@ -16,7 +23,7 @@
   justify-content: space-between;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45), 0 0 32px var(--win-accent-subtle), var(--liquid-glass-specular);
 }
 
 .heroBanner::before {
@@ -24,10 +31,10 @@
   position: absolute;
   top: -40px;
   right: 180px;
-  width: 200px;
-  height: 200px;
+  width: 220px;
+  height: 220px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(59, 130, 246, 0) 70%);
+  background: radial-gradient(circle, var(--win-accent-glow, rgba(59, 130, 246, 0.3)) 0%, rgba(var(--win-accent-rgb), 0) 70%);
   pointer-events: none;
 }
 
@@ -185,9 +192,11 @@
 .captureBtn {
   height: 36px;
   padding: 0 14px;
-  background: rgba(37, 99, 235, 0.12);
-  border: 1px solid rgba(59, 130, 246, 0.35);
-  color: #60a5fa;
+  background: rgba(var(--win-accent-rgb), 0.12);
+  border: 1px solid var(--win-accent-border, rgba(59, 130, 246, 0.35));
+  color: var(--win-accent, #60a5fa);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 8px;
   font-weight: 600;
   font-size: 13px;
@@ -199,15 +208,15 @@
 }
 
 .captureBtn:hover {
-  background: rgba(37, 99, 235, 0.22);
-  border-color: #3b82f6;
-  color: #93c5fd;
+  background: rgba(var(--win-accent-rgb), 0.22);
+  border-color: var(--win-accent, #3b82f6);
+  box-shadow: 0 0 16px var(--win-accent-subtle);
 }
 
 .primaryBtn {
   height: 36px;
   padding: 0 16px;
-  background: #2563eb;
+  background: var(--win-accent, #2563eb);
   color: #ffffff;
   border-radius: 8px;
   border: none;
@@ -218,12 +227,12 @@
   gap: 8px;
   cursor: pointer;
   transition: all 120ms ease;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 4px 14px var(--win-accent-glow), inset 0 1px 1px rgba(255, 255, 255, 0.35);
 }
 
 .primaryBtn:hover {
-  background: #1d4ed8;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.55);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 18px var(--win-accent-glow), inset 0 1px 1px rgba(255, 255, 255, 0.5);
 }
 
 .grid {
@@ -279,22 +288,31 @@
 }
 
 .actionCard {
-  background: #181c28;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--liquid-glass-bg);
+  backdrop-filter: var(--liquid-blur);
+  -webkit-backdrop-filter: var(--liquid-blur);
+  border: var(--liquid-glass-border);
   border-radius: 12px;
   padding: 14px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
   cursor: pointer;
-  transition: all 130ms ease;
+  transition: all var(--transition-normal);
   user-select: none;
+  box-shadow: var(--liquid-glass-specular), 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 .actionCard:hover {
-  background: #1e2434;
-  border-color: rgba(255, 255, 255, 0.16);
-  transform: translateY(-1px);
+  background: linear-gradient(
+    135deg,
+    rgba(32, 38, 56, 0.85) 0%,
+    rgba(var(--win-accent-rgb), 0.14) 50%,
+    rgba(22, 28, 42, 0.9) 100%
+  );
+  border-color: rgba(var(--win-accent-rgb), 0.45);
+  transform: translateY(-2px);
+  box-shadow: var(--liquid-glass-specular), 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 20px var(--win-accent-subtle);
 }
 
 .actionIconBox {
@@ -388,8 +406,11 @@
   align-items: center;
   padding: 10px 14px;
   border-radius: 10px;
-  background: #181c28;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--liquid-glass-bg);
+  backdrop-filter: var(--liquid-blur);
+  -webkit-backdrop-filter: var(--liquid-blur);
+  border: var(--liquid-glass-border);
+  box-shadow: var(--liquid-glass-specular);
   gap: 12px;
 }
 

@@ -169,3 +169,13 @@ export interface CapturedWindowApp {
   executablePath: string;
   windowTitle: string;
 }
+
+export interface WindowsThemeColorDTO {
+  hex: string;
+  r: number;
+  g: number;
+  b: number;
+  accentGlow: string;
+  accentSubtle: string;
+  liquidHighlight: string;
+}

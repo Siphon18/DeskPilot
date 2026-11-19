@@ -2,6 +2,7 @@ use tauri::State;
 use crate::database::connection::DbState;
 use crate::database::repositories::settings_repo;
 use crate::adapters::folder_launcher::open_folder;
+use crate::adapters::theme_color::{self, WindowsThemeColorDTO};
 use crate::models::{AppSettings, CommandError};
 
 #[tauri::command]
@@ -35,4 +36,9 @@ pub fn settings_open_data_folder(
 ) -> Result<(), CommandError> {
     let data_dir_str = state.data_dir.to_string_lossy().to_string();
     open_folder(&data_dir_str)
+}
+
+#[tauri::command]
+pub fn settings_get_windows_theme_color() -> WindowsThemeColorDTO {
+    theme_color::get_windows_active_theme_color()
 }
