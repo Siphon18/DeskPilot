@@ -13,10 +13,10 @@ use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-            if let Some(window) = app.get_webview_window("main") {
-                let _ = window.show();
-                let _ = window.unminimize();
-                let _ = window.set_focus();
+            if let Some(launcher) = app.get_webview_window("launcher") {
+                let _ = launcher.show();
+                let _ = launcher.unminimize();
+                let _ = launcher.set_focus();
             }
         }))
         .plugin(tauri_plugin_dialog::init())
@@ -35,15 +35,20 @@ pub fn run() {
                 let _ = database::repositories::launch_repo::prune_old_runs(&conn);
             }
 
-            // Apply Windows 11 Mica / Acrylic native liquid glass effect
+            // Apply Windows 11 Mica / Acrylic native liquid glass effect to both windows
             #[cfg(target_os = "windows")]
             {
-                if let Some(window) = app.get_webview_window("main") {
-                    use window_vibrancy::{apply_mica, apply_acrylic};
-                    // Attempt Windows 11 native Mica effect (dark mode)
-                    if apply_mica(&window, Some(true)).is_err() {
-                        // Fallback to Windows 10/11 Acrylic
-                        let _ = apply_acrylic(&window, Some((17, 21, 27, 210)));
+                use window_vibrancy::{apply_mica, apply_acrylic};
+
+                if let Some(main) = app.get_webview_window("main") {
+                    if apply_mica(&main, Some(true)).is_err() {
+                        let _ = apply_acrylic(&main, Some((17, 21, 27, 210)));
+                    }
+                }
+
+                if let Some(launcher) = app.get_webview_window("launcher") {
+                    if apply_acrylic(&launcher, Some((20, 26, 36, 220))).is_err() {
+                        let _ = apply_mica(&launcher, Some(true));
                     }
                 }
             }
@@ -51,11 +56,11 @@ pub fn run() {
             // Create System Tray with Quick Actions (matching design mockup)
             let launcher_item = MenuItem::with_id(app, "launcher", "Quick Launcher (Ctrl+Space)", true, None::<&str>)?;
             let capture_item = MenuItem::with_id(app, "capture", "Capture Desktop (Ctrl+Shift+C)", true, None::<&str>)?;
-            let dashboard_item = MenuItem::with_id(app, "dashboard", "Open Dashboard", true, None::<&str>)?;
+            let settings_item = MenuItem::with_id(app, "settings", "Settings & Workspaces", true, None::<&str>)?;
             let sep = PredefinedMenuItem::separator(app)?;
             let quit_item = MenuItem::with_id(app, "quit", "Quit DeskPilot", true, None::<&str>)?;
 
-            let menu = Menu::with_items(app, &[&launcher_item, &capture_item, &dashboard_item, &sep, &quit_item])?;
+            let menu = Menu::with_items(app, &[&launcher_item, &capture_item, &settings_item, &sep, &quit_item])?;
 
             let mut tray_builder = TrayIconBuilder::new()
                 .menu(&menu)
@@ -64,28 +69,22 @@ pub fn run() {
                 .on_menu_event(|app, event| {
                     match event.id.as_ref() {
                         "launcher" => {
-                            if let Some(window) = app.get_webview_window("main") {
-                                let _ = window.show();
-                                let _ = window.unminimize();
-                                let _ = window.set_focus();
-                                let _ = window.emit("quick-switcher:show", ());
+                            if let Some(launcher) = app.get_webview_window("launcher") {
+                                let _ = launcher.show();
+                                let _ = launcher.unminimize();
+                                let _ = launcher.set_focus();
+                                let _ = launcher.emit("quick-launcher:focus", ());
                             }
                         }
                         "capture" => {
-                            if let Some(window) = app.get_webview_window("main") {
-                                let _ = window.show();
-                                let _ = window.unminimize();
-                                let _ = window.set_focus();
-                                let _ = window.emit("workspace:capture-desktop", ());
+                            if let Some(launcher) = app.get_webview_window("launcher") {
+                                let _ = launcher.show();
+                                let _ = launcher.set_focus();
+                                let _ = launcher.emit("workspace:capture-desktop", ());
                             }
                         }
-                        "dashboard" => {
-                            if let Some(window) = app.get_webview_window("main") {
-                                let _ = window.show();
-                                let _ = window.unminimize();
-                                let _ = window.set_focus();
-                                let _ = window.emit("dashboard:show", ());
-                            }
+                        "settings" => {
+                            let _ = commands::window::open_main_dashboard(app.clone());
                         }
                         "quit" => {
                             app.exit(0);
@@ -96,14 +95,14 @@ pub fn run() {
                 .on_tray_icon_event(|tray, event| {
                     if let TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, .. } = event {
                         let app = tray.app_handle();
-                        if let Some(window) = app.get_webview_window("main") {
-                            if window.is_visible().unwrap_or(false) {
-                                let _ = window.hide();
+                        if let Some(launcher) = app.get_webview_window("launcher") {
+                            if launcher.is_visible().unwrap_or(false) {
+                                let _ = launcher.hide();
                             } else {
-                                let _ = window.show();
-                                let _ = window.unminimize();
-                                let _ = window.set_focus();
-                                let _ = window.emit("quick-switcher:show", ());
+                                let _ = launcher.show();
+                                let _ = launcher.unminimize();
+                                let _ = launcher.set_focus();
+                                let _ = launcher.emit("quick-launcher:focus", ());
                             }
                         }
                     }
@@ -124,11 +123,15 @@ pub fn run() {
 
             let _ = app.global_shortcut().on_shortcut(shortcut, |app, _shortcut, event| {
                 if event.state == ShortcutState::Pressed {
-                    if let Some(window) = app.get_webview_window("main") {
-                        let _ = window.show();
-                        let _ = window.unminimize();
-                        let _ = window.set_focus();
-                        let _ = window.emit("quick-switcher:show", ());
+                    if let Some(launcher) = app.get_webview_window("launcher") {
+                        if launcher.is_visible().unwrap_or(false) {
+                            let _ = launcher.hide();
+                        } else {
+                            let _ = launcher.show();
+                            let _ = launcher.unminimize();
+                            let _ = launcher.set_focus();
+                            let _ = launcher.emit("quick-launcher:focus", ());
+                        }
                     }
                 }
             });
@@ -137,11 +140,15 @@ pub fn run() {
             if let Ok(alt_shortcut) = "ctrl+alt+space".parse::<Shortcut>() {
                 let _ = app.global_shortcut().on_shortcut(alt_shortcut, |app, _shortcut, event| {
                     if event.state == ShortcutState::Pressed {
-                        if let Some(window) = app.get_webview_window("main") {
-                            let _ = window.show();
-                            let _ = window.unminimize();
-                            let _ = window.set_focus();
-                            let _ = window.emit("quick-switcher:show", ());
+                        if let Some(launcher) = app.get_webview_window("launcher") {
+                            if launcher.is_visible().unwrap_or(false) {
+                                let _ = launcher.hide();
+                            } else {
+                                let _ = launcher.show();
+                                let _ = launcher.unminimize();
+                                let _ = launcher.set_focus();
+                                let _ = launcher.emit("quick-launcher:focus", ());
+                            }
                         }
                     }
                 });
@@ -186,6 +193,8 @@ pub fn run() {
             commands::settings::settings_get_windows_theme_color,
             commands::window::window_hide,
             commands::window::window_show,
+            commands::window::open_main_dashboard,
+            commands::window::close_launcher,
         ])
         .run(tauri::generate_context!())
         .expect("error while running DeskPilot application");

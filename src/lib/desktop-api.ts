@@ -83,6 +83,8 @@ export const desktopApi = {
   window: {
     hide: (): Promise<void> => invoke<void>('window_hide'),
     show: (): Promise<void> => invoke<void>('window_show'),
+    openMainDashboard: (): Promise<void> => invoke<void>('open_main_dashboard'),
+    closeLauncher: (): Promise<void> => invoke<void>('close_launcher'),
   },
 };
 
