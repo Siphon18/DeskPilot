@@ -1,0 +1,81 @@
+pub mod adapters;
+pub mod commands;
+pub mod database;
+pub mod models;
+pub mod services;
+
+use tauri::{Emitter, Manager};
+use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
+
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn run() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.show();
+                let _ = window.unminimize();
+                let _ = window.set_focus();
+            }
+        }))
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .setup(|app| {
+            // Initialize Database and run migrations
+            let db = database::connection::init_db(app.handle())
+                .expect("Failed to initialize DeskPilot database");
+
+            {
+                let mut conn = db.conn.lock().expect("Failed to lock database");
+                database::migrate::run_migrations(&mut conn)
+                    .expect("Failed to execute database migrations");
+
+                // Prune old runs on startup as per FR-L05
+                let _ = database::repositories::launch_repo::prune_old_runs(&conn);
+            }
+
+            // Register default global shortcut Ctrl+Alt+Space as per FR-Q01
+            if let Ok(shortcut) = "ctrl+alt+space".parse::<Shortcut>() {
+                let _ = app.global_shortcut().on_shortcut(shortcut, |app, _shortcut, event| {
+                    if event.state == ShortcutState::Pressed {
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.show();
+                            let _ = window.unminimize();
+                            let _ = window.set_focus();
+                            let _ = window.emit("quick-switcher:show", ());
+                        }
+                    }
+                });
+            }
+
+            app.manage(db);
+
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![
+            commands::workspace::workspace_list,
+            commands::workspace::workspace_get,
+            commands::workspace::workspace_create,
+            commands::workspace::workspace_update,
+            commands::workspace::workspace_delete,
+            commands::workspace::workspace_duplicate,
+            commands::item::item_create,
+            commands::item::item_update,
+            commands::item::item_delete,
+            commands::item::item_reorder,
+            commands::item::pick_executable,
+            commands::item::pick_folder,
+            commands::notes::note_save,
+            commands::tasks::task_create,
+            commands::tasks::task_toggle,
+            commands::tasks::task_delete,
+            commands::tasks::task_reorder,
+            commands::launch::launch_workspace,
+            commands::launch::launch_get_run,
+            commands::launch::launch_list_runs,
+            commands::settings::settings_get,
+            commands::settings::settings_update,
+            commands::settings::settings_open_data_folder,
+        ])
+        .run(tauri::generate_context!())
+        .expect("error while running DeskPilot application");
+}

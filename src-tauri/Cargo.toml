@@ -1,0 +1,28 @@
+[package]
+name = "deskpilot"
+version = "0.1.0"
+description = "Local-first Windows workspace launcher"
+edition = "2024"
+rust-version = "1.90"
+
+[lib]
+name = "deskpilot_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.7.6" }
+
+[dependencies]
+tauri = { version = "2.12.7", features = ["tray-icon"] }
+tauri-plugin-dialog = "2"
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-single-instance = "2"
+tauri-plugin-log = "2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rusqlite = { version = "0.43", features = ["bundled"] }
+uuid = { version = "1.15", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+url = "2.5"
+windows = { version = "0.62", features = ["Win32_UI_Shell", "Win32_Foundation"] }
+log = "0.4"
