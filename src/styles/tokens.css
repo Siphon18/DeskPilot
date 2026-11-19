@@ -31,82 +31,82 @@
   --transition-normal: 160ms cubic-bezier(0.1, 0.9, 0.2, 1);
 }
 
-/* Light Theme (Default) */
-:root, [data-theme="light"] {
-  --bg-app: #f3f3f3;
-  --bg-sidebar: #f8f8f8;
+/* Default Dark Fluent Theme (Windows 11 Inspired) */
+:root, [data-theme="dark"] {
+  --bg-app: #0f131a;
+  --bg-sidebar: #131722;
+  --bg-card: #181c28;
+  --bg-card-hover: #202636;
+  --bg-subtle: #1a1f2e;
+  --bg-input: #141824;
+  --bg-modal: #171c29;
+  --bg-overlay: rgba(8, 11, 16, 0.7);
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+  --text-disabled: #475569;
+
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-hover: rgba(255, 255, 255, 0.2);
+  --border-focus: #3b82f6;
+
+  --accent-primary: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-active: #1e40af;
+  --accent-text: #ffffff;
+  --accent-subtle: rgba(37, 99, 235, 0.15);
+
+  --status-success: #10b981;
+  --status-success-bg: rgba(16, 185, 129, 0.15);
+  --status-warning: #f59e0b;
+  --status-warning-bg: rgba(245, 158, 11, 0.15);
+  --status-error: #ef4444;
+  --status-error-bg: rgba(239, 68, 68, 0.15);
+
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-flyout: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --shadow-modal: 0 24px 48px rgba(0, 0, 0, 0.6);
+}
+
+/* Light Theme */
+[data-theme="light"] {
+  --bg-app: #f4f6f9;
+  --bg-sidebar: #f8fafc;
   --bg-card: #ffffff;
-  --bg-card-hover: #fafafa;
-  --bg-subtle: #edebe9;
+  --bg-card-hover: #f1f5f9;
+  --bg-subtle: #e2e8f0;
   --bg-input: #ffffff;
   --bg-modal: #ffffff;
   --bg-overlay: rgba(0, 0, 0, 0.4);
 
-  --text-primary: #1f1f1f;
-  --text-secondary: #616161;
-  --text-tertiary: #8a8886;
-  --text-disabled: #a19f9d;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+  --text-disabled: #94a3b8;
 
   --border-subtle: rgba(0, 0, 0, 0.06);
-  --border-default: rgba(0, 0, 0, 0.12);
-  --border-hover: rgba(0, 0, 0, 0.2);
-  --border-focus: #0067b8;
+  --border-default: rgba(0, 0, 0, 0.1);
+  --border-hover: rgba(0, 0, 0, 0.18);
+  --border-focus: #2563eb;
 
-  --accent-primary: #0067b8;
-  --accent-hover: #005da6;
-  --accent-active: #005293;
+  --accent-primary: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-active: #1e40af;
   --accent-text: #ffffff;
-  --accent-subtle: rgba(0, 103, 184, 0.08);
+  --accent-subtle: rgba(37, 99, 235, 0.08);
 
-  --status-success: #107c10;
-  --status-success-bg: #dff6dd;
-  --status-warning: #8a6200;
-  --status-warning-bg: #fff4ce;
-  --status-error: #c42b1c;
-  --status-error-bg: #fde7e9;
+  --status-success: #10b981;
+  --status-success-bg: #d1fae5;
+  --status-warning: #f59e0b;
+  --status-warning-bg: #fef3c7;
+  --status-error: #ef4444;
+  --status-error-bg: #fee2e2;
 
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.04);
-  --shadow-flyout: 0 4px 12px rgba(0, 0, 0, 0.12);
-  --shadow-modal: 0 12px 28px rgba(0, 0, 0, 0.2);
-}
-
-/* Dark Theme */
-[data-theme="dark"] {
-  --bg-app: #202020;
-  --bg-sidebar: #262626;
-  --bg-card: #2b2b2b;
-  --bg-card-hover: #323232;
-  --bg-subtle: #272727;
-  --bg-input: #1e1e1e;
-  --bg-modal: #2c2c2c;
-  --bg-overlay: rgba(0, 0, 0, 0.6);
-
-  --text-primary: #f3f3f3;
-  --text-secondary: #a19f9d;
-  --text-tertiary: #797775;
-  --text-disabled: #585654;
-
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.12);
-  --border-hover: rgba(255, 255, 255, 0.2);
-  --border-focus: #4cc2ff;
-
-  --accent-primary: #4cc2ff;
-  --accent-hover: #3aa8e6;
-  --accent-active: #2d96d2;
-  --accent-text: #000000;
-  --accent-subtle: rgba(76, 194, 255, 0.12);
-
-  --status-success: #54b054;
-  --status-success-bg: #1a3818;
-  --status-warning: #fce100;
-  --status-warning-bg: #383400;
-  --status-error: #ff99a4;
-  --status-error-bg: #44161b;
-
-  --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.25);
-  --shadow-flyout: 0 8px 20px rgba(0, 0, 0, 0.4);
-  --shadow-modal: 0 16px 36px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-flyout: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-modal: 0 16px 36px rgba(0, 0, 0, 0.2);
 }
 
 /* High Contrast / Reduced Motion */

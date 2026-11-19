@@ -33,9 +33,27 @@ pub fn run() {
                 let _ = database::repositories::launch_repo::prune_old_runs(&conn);
             }
 
-            // Register default global shortcut Ctrl+Alt+Space as per FR-Q01
-            if let Ok(shortcut) = "ctrl+alt+space".parse::<Shortcut>() {
-                let _ = app.global_shortcut().on_shortcut(shortcut, |app, _shortcut, event| {
+            // Register default global shortcut Ctrl+Space (or Ctrl+Alt+Space fallback)
+            let shortcut_res = "ctrl+space".parse::<Shortcut>();
+            let shortcut = match shortcut_res {
+                Ok(s) => s,
+                Err(_) => "ctrl+alt+space".parse::<Shortcut>().expect("Valid shortcut format"),
+            };
+
+            let _ = app.global_shortcut().on_shortcut(shortcut, |app, _shortcut, event| {
+                if event.state == ShortcutState::Pressed {
+                    if let Some(window) = app.get_webview_window("main") {
+                        let _ = window.show();
+                        let _ = window.unminimize();
+                        let _ = window.set_focus();
+                        let _ = window.emit("quick-switcher:show", ());
+                    }
+                }
+            });
+
+            // Also register ctrl+alt+space just in case
+            if let Ok(alt_shortcut) = "ctrl+alt+space".parse::<Shortcut>() {
+                let _ = app.global_shortcut().on_shortcut(alt_shortcut, |app, _shortcut, event| {
                     if event.state == ShortcutState::Pressed {
                         if let Some(window) = app.get_webview_window("main") {
                             let _ = window.show();
@@ -58,6 +76,8 @@ pub fn run() {
             commands::workspace::workspace_update,
             commands::workspace::workspace_delete,
             commands::workspace::workspace_duplicate,
+            commands::workspace::workspace_get_open_apps,
+            commands::workspace::workspace_capture_current,
             commands::item::item_create,
             commands::item::item_update,
             commands::item::item_delete,

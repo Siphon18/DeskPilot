@@ -11,6 +11,7 @@ import type {
   LaunchRunDTO,
   LaunchProgressEvent,
   AppSettings,
+  CapturedWindowApp,
 } from './types';
 
 export const desktopApi = {
@@ -27,6 +28,10 @@ export const desktopApi = {
       invoke<void>('workspace_delete', { id }),
     duplicate: (id: string): Promise<WorkspaceDetailDTO> =>
       invoke<WorkspaceDetailDTO>('workspace_duplicate', { id }),
+    captureCurrent: (name?: string): Promise<WorkspaceDetailDTO> =>
+      invoke<WorkspaceDetailDTO>('workspace_capture_current', { name }),
+    getOpenApps: (): Promise<CapturedWindowApp[]> =>
+      invoke<CapturedWindowApp[]>('workspace_get_open_apps'),
   },
   items: {
     create: (workspaceId: string, input: any): Promise<LaunchItemDTO> =>

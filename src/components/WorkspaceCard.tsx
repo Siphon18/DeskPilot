@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Star, MoreVertical, Copy, Trash2, Edit3, Layers, Clock } from 'lucide-react';
+import { Play, Star, MoreVertical, Copy, Trash2, Edit3, Folder, Code2, GraduationCap, Briefcase, Layers } from 'lucide-react';
 import type { WorkspaceDTO } from '../lib/types';
-import { IconRenderer, AVAILABLE_COLORS } from './IconRenderer';
 import styles from './WorkspaceCard.module.css';
 
 interface WorkspaceCardProps {
@@ -38,48 +37,56 @@ export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [menuOpen]);
 
-  const colorMeta = AVAILABLE_COLORS.find((c) => c.id === workspace.color) || AVAILABLE_COLORS[0];
-
-  const formatLastLaunched = (iso: string | null) => {
-    if (!iso) return 'Never launched';
-    const date = new Date(iso);
-    const now = new Date();
-    const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (diffSec < 60) return 'Just now';
-    if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
-    if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
-    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  const getWorkspaceColor = () => {
+    const lowerName = workspace.name.toLowerCase();
+    if (lowerName.includes('dev') || lowerName.includes('code') || workspace.color === 'blue' || workspace.color === '#3b82f6') {
+      return '#38bdf8';
+    }
+    if (lowerName.includes('study') || lowerName.includes('learn') || workspace.color === 'purple' || workspace.color === '#8b5cf6') {
+      return '#a855f7';
+    }
+    if (lowerName.includes('job') || lowerName.includes('work') || workspace.color === 'green' || workspace.color === '#10b981') {
+      return '#10b981';
+    }
+    if (workspace.color === 'orange' || workspace.color === '#f97316') return '#fb923c';
+    if (workspace.color === 'pink' || workspace.color === '#ec4899') return '#f472b6';
+    return '#3b82f6';
   };
 
+  const getCardIcon = () => {
+    const lowerName = workspace.name.toLowerCase();
+    if (lowerName.includes('dev') || lowerName.includes('code') || workspace.icon === 'code' || workspace.icon === 'terminal') {
+      return <Code2 size={20} />;
+    }
+    if (lowerName.includes('study') || lowerName.includes('learn') || workspace.icon === 'book' || workspace.icon === 'graduation-cap') {
+      return <GraduationCap size={20} />;
+    }
+    if (lowerName.includes('job') || lowerName.includes('work') || workspace.icon === 'briefcase') {
+      return <Briefcase size={20} />;
+    }
+    return <Layers size={20} />;
+  };
+
+  const accentColor = getWorkspaceColor();
+
   return (
-    <div className={styles.card}>
+    <div
+      className={styles.card}
+      onClick={() => onOpenDetail?.(workspace.id)}
+      style={{ borderLeft: `3px solid ${accentColor}` }}
+    >
       <div className={styles.cardHeader}>
         <div
-          className={styles.iconAndTitle}
-          onClick={() => onOpenDetail?.(workspace.id)}
-          style={{ cursor: onOpenDetail ? 'pointer' : 'default' }}
+          className={styles.iconBox}
+          style={{
+            backgroundColor: `${accentColor}1c`,
+            color: accentColor,
+          }}
         >
-          <div
-            className={styles.iconBox}
-            style={{
-              backgroundColor: `${colorMeta.hex}18`,
-              color: colorMeta.hex,
-            }}
-          >
-            <IconRenderer name={workspace.icon} size={22} color={colorMeta.hex} />
-          </div>
-          <div className={styles.titleArea}>
-            <h3 className={styles.title} title={workspace.name}>
-              {workspace.name}
-            </h3>
-            <p className={styles.description} title={workspace.description}>
-              {workspace.description || 'No description provided.'}
-            </p>
-          </div>
+          {getCardIcon()}
         </div>
 
-        <div className={styles.headerActions} ref={menuRef}>
+        <div className={styles.headerActions} ref={menuRef} onClick={(e) => e.stopPropagation()}>
           <button
             className={`${styles.iconBtn} ${workspace.isFavorite ? styles.favActive : ''}`}
             onClick={(e) => {
@@ -89,7 +96,7 @@ export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({
             title={workspace.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
             aria-label="Favorite toggle"
           >
-            <Star size={16} fill={workspace.isFavorite ? '#ffaa00' : 'none'} />
+            <Star size={16} fill={workspace.isFavorite ? '#ffaa00' : 'none'} color={workspace.isFavorite ? '#ffaa00' : '#64748b'} />
           </button>
 
           <button
@@ -143,36 +150,32 @@ export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({
         </div>
       </div>
 
-      <div className={styles.cardMeta}>
-        <span className={styles.metaItem}>
-          <Layers size={13} />
-          <span>{workspace.itemCount} {workspace.itemCount === 1 ? 'item' : 'items'}</span>
-        </span>
-        <span className={styles.metaItem} title={workspace.lastLaunchedAt || undefined}>
-          <Clock size={13} />
-          <span>{formatLastLaunched(workspace.lastLaunchedAt)}</span>
-        </span>
+      <div className={styles.contentArea}>
+        <h3 className={styles.title} title={workspace.name}>
+          {workspace.name}
+        </h3>
+        <p className={styles.subtitle} title={workspace.description}>
+          {workspace.description || (workspace.itemCount > 0 ? `${workspace.itemCount} items configured` : 'Ready to launch')}
+        </p>
       </div>
 
       <div className={styles.cardFooter}>
-        <button
-          className={styles.launchBtn}
-          onClick={() => onLaunch(workspace.id)}
-          title={`Launch ${workspace.name}`}
-        >
-          <Play size={14} fill="currentColor" />
-          <span>Launch</span>
-        </button>
+        <div className={styles.itemBadge}>
+          <Folder size={12} className={styles.itemBadgeIcon} />
+          <span>{workspace.itemCount} {workspace.itemCount === 1 ? 'item' : 'items'}</span>
+        </div>
 
-        {onOpenDetail && (
-          <button
-            className={styles.editBtn}
-            onClick={() => onOpenDetail(workspace.id)}
-            title="Open workspace setup"
-          >
-            Manage
-          </button>
-        )}
+        <button
+          className={styles.playButton}
+          onClick={(e) => {
+            e.stopPropagation();
+            onLaunch(workspace.id);
+          }}
+          title={`Launch ${workspace.name} (1-click)`}
+          aria-label={`Launch ${workspace.name}`}
+        >
+          <Play size={14} fill="#ffffff" color="#ffffff" />
+        </button>
       </div>
     </div>
   );

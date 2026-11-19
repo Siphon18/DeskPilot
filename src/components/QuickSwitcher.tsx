@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Search, Star, Play, CornerDownLeft } from 'lucide-react';
+import { Search, Play, FileText, Settings, Camera, Code2, GraduationCap, Briefcase, Layers } from 'lucide-react';
 import type { WorkspaceDTO } from '../lib/types';
-import { IconRenderer, AVAILABLE_COLORS } from './IconRenderer';
 import styles from './QuickSwitcher.module.css';
 
 interface QuickSwitcherProps {
@@ -9,6 +8,9 @@ interface QuickSwitcherProps {
   onClose: () => void;
   workspaces: WorkspaceDTO[];
   onLaunch: (id: string) => void;
+  onOpenNotes?: () => void;
+  onOpenSettings?: () => void;
+  onCaptureCurrent?: () => void;
 }
 
 export const QuickSwitcher: React.FC<QuickSwitcherProps> = ({
@@ -16,6 +18,9 @@ export const QuickSwitcher: React.FC<QuickSwitcherProps> = ({
   onClose,
   workspaces,
   onLaunch,
+  onOpenNotes,
+  onOpenSettings,
+  onCaptureCurrent,
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -37,7 +42,7 @@ export const QuickSwitcher: React.FC<QuickSwitcherProps> = ({
         (w) => w.name.toLowerCase().includes(q) || w.description.toLowerCase().includes(q)
       );
     } else {
-      // Group: favorites first, then recently launched
+      // Favorites first, then most recently launched
       list.sort((a, b) => {
         if (a.isFavorite && !b.isFavorite) return -1;
         if (!a.isFavorite && b.isFavorite) return 1;
@@ -50,7 +55,6 @@ export const QuickSwitcher: React.FC<QuickSwitcherProps> = ({
     return list;
   }, [workspaces, query]);
 
-  // Adjust selectedIndex when list changes
   useEffect(() => {
     setSelectedIndex((prev) => (filtered.length > 0 ? Math.min(prev, filtered.length - 1) : 0));
   }, [filtered.length]);
@@ -76,36 +80,61 @@ export const QuickSwitcher: React.FC<QuickSwitcherProps> = ({
     }
   };
 
+  const getWorkspaceIcon = (name: string, iconKey: string) => {
+    const lower = name.toLowerCase();
+    if (lower.includes('dev') || lower.includes('code') || iconKey === 'terminal' || iconKey === 'code') {
+      return <Code2 size={18} />;
+    }
+    if (lower.includes('study') || lower.includes('learn') || iconKey === 'book' || iconKey === 'book-open') {
+      return <GraduationCap size={18} />;
+    }
+    if (lower.includes('job') || lower.includes('work') || lower.includes('career') || iconKey === 'briefcase') {
+      return <Briefcase size={18} />;
+    }
+    return <Layers size={18} />;
+  };
+
+  const getAccentColor = (ws: WorkspaceDTO, idx: number) => {
+    if (ws.color === 'blue' || ws.color === '#3b82f6') return '#38bdf8';
+    if (ws.color === 'purple' || ws.color === '#8b5cf6') return '#c084fc';
+    if (ws.color === 'green' || ws.color === '#10b981') return '#34d399';
+    if (ws.color === 'orange' || ws.color === '#f97316') return '#fb923c';
+    if (ws.color === 'pink' || ws.color === '#ec4899') return '#f472b6';
+    const fallbackPalette = ['#38bdf8', '#c084fc', '#34d399', '#fb923c'];
+    return fallbackPalette[idx % fallbackPalette.length];
+  };
+
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+      <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
+        {/* Search header with Ctrl + Space badge */}
         <div className={styles.searchHeader}>
           <Search size={18} className={styles.searchIcon} />
           <input
             ref={inputRef}
             type="text"
             className={styles.searchInput}
-            placeholder="Type a workspace name to launch..."
+            placeholder="Search workspace..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
           />
-          <span className={styles.shortcutHint}>ESC to close</span>
+          <span className={styles.shortcutBadge}>Ctrl + Space</span>
         </div>
 
+        {/* Workspace cards list */}
         <div className={styles.resultsList}>
           {filtered.length === 0 ? (
-            <div className={styles.emptyState}>No workspaces match your search</div>
+            <div className={styles.emptyState}>No workspaces found</div>
           ) : (
             filtered.map((ws, idx) => {
-              const colorMeta =
-                AVAILABLE_COLORS.find((c) => c.id === ws.color) || AVAILABLE_COLORS[0];
               const isSelected = idx === selectedIndex;
+              const accentColor = getAccentColor(ws, idx);
 
               return (
                 <div
                   key={ws.id}
-                  className={`${styles.itemRow} ${isSelected ? styles.itemRowActive : ''}`}
+                  className={`${styles.workspaceCard} ${isSelected ? styles.workspaceCardActive : ''}`}
                   onClick={() => {
                     onLaunch(ws.id);
                     onClose();
@@ -113,49 +142,96 @@ export const QuickSwitcher: React.FC<QuickSwitcherProps> = ({
                   onMouseEnter={() => setSelectedIndex(idx)}
                 >
                   <div
-                    className={styles.itemIcon}
-                    style={{ backgroundColor: `${colorMeta.hex}18`, color: colorMeta.hex }}
+                    className={styles.iconBox}
+                    style={{
+                      backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.2)' : `${accentColor}20`,
+                      color: isSelected ? '#ffffff' : accentColor,
+                    }}
                   >
-                    <IconRenderer name={ws.icon} size={16} color={colorMeta.hex} />
+                    {getWorkspaceIcon(ws.name, ws.icon)}
                   </div>
 
-                  <div className={styles.itemInfo}>
-                    <span className={styles.itemName}>
-                      <span>{ws.name}</span>
-                      {ws.isFavorite && <Star size={12} fill="#ffaa00" color="#ffaa00" />}
-                    </span>
-                    <span className={styles.itemDesc}>
-                      {ws.description || `${ws.itemCount} items`}
+                  <div className={styles.cardInfo}>
+                    <span className={styles.cardTitle}>{ws.name}</span>
+                    <span className={styles.cardSubtitle}>
+                      {ws.description || (ws.itemCount > 0 ? `${ws.itemCount} configured apps` : 'Ready to launch')}
                     </span>
                   </div>
 
-                  {isSelected && (
-                    <div className={styles.itemEnterHint}>
-                      <Play size={12} fill="currentColor" />
-                      <span>Launch</span>
-                      <CornerDownLeft size={12} />
-                    </div>
-                  )}
+                  <button
+                    className={`${styles.playButton} ${isSelected ? styles.playButtonActive : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onLaunch(ws.id);
+                      onClose();
+                    }}
+                    title="Launch workspace in 1 click"
+                    aria-label={`Launch ${ws.name}`}
+                  >
+                    <Play size={14} fill="currentColor" />
+                  </button>
                 </div>
               );
             })
           )}
         </div>
 
+        <div className={styles.divider} />
+
+        {/* Quick Actions row */}
+        <div className={styles.quickActions}>
+          {onCaptureCurrent && (
+            <button
+              className={styles.actionRow}
+              onClick={() => {
+                onCaptureCurrent();
+                onClose();
+              }}
+            >
+              <div className={styles.actionLeft}>
+                <Camera size={16} className={styles.actionIcon} />
+                <span>1-Click Capture Desktop</span>
+              </div>
+              <span className={styles.actionBadge}>Ctrl + Shift + C</span>
+            </button>
+          )}
+
+          <button
+            className={styles.actionRow}
+            onClick={() => {
+              onOpenNotes?.();
+              onClose();
+            }}
+          >
+            <div className={styles.actionLeft}>
+              <FileText size={16} className={styles.actionIcon} />
+              <span>Open Quick Notes</span>
+            </div>
+            <span className={styles.actionBadge}>Ctrl + N</span>
+          </button>
+
+          <button
+            className={styles.actionRow}
+            onClick={() => {
+              onOpenSettings?.();
+              onClose();
+            }}
+          >
+            <div className={styles.actionLeft}>
+              <Settings size={16} className={styles.actionIcon} />
+              <span>Open Settings</span>
+            </div>
+            <span className={styles.actionBadge}>Ctrl + ,</span>
+          </button>
+        </div>
+
+        {/* Footer */}
         <div className={styles.footer}>
-          <div className={styles.keyHints}>
-            <span className={styles.keyHint}>
-              <span className={styles.keyBadge}>↑</span>
-              <span className={styles.keyBadge}>↓</span> to navigate
-            </span>
-            <span className={styles.keyHint}>
-              <span className={styles.keyBadge}>↵</span> to launch
-            </span>
-            <span className={styles.keyHint}>
-              <span className={styles.keyBadge}>esc</span> to dismiss
-            </span>
+          <div className={styles.footerBrand}>
+            <span className={styles.footerDot} />
+            <span className={styles.footerBrandText}>DeskPilot</span>
           </div>
-          <span>DeskPilot Quick Switcher</span>
+          <span className={styles.footerDismiss}>Press Esc to close</span>
         </div>
       </div>
     </div>

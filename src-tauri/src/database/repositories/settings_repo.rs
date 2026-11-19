@@ -15,7 +15,7 @@ pub fn get_settings(conn: &Connection, data_dir: &str) -> Result<AppSettings, Co
     let mut settings = match val_opt {
         Some(s) => serde_json::from_str::<AppSettings>(&s).unwrap_or_else(|_| AppSettings {
             theme: "system".into(),
-            global_shortcut: "Ctrl+Alt+Space".into(),
+            global_shortcut: "Ctrl+Space".into(),
             keep_running_in_tray: false,
             url_delay_ms: 250,
             show_launch_toast: true,
@@ -23,7 +23,7 @@ pub fn get_settings(conn: &Connection, data_dir: &str) -> Result<AppSettings, Co
         }),
         None => AppSettings {
             theme: "system".into(),
-            global_shortcut: "Ctrl+Alt+Space".into(),
+            global_shortcut: "Ctrl+Space".into(),
             keep_running_in_tray: false,
             url_delay_ms: 250,
             show_launch_toast: true,

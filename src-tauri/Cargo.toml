@@ -10,7 +10,7 @@ name = "deskpilot_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.7.6" }
+tauri-build = { version = "2.7.6", features = [] }
 
 [dependencies]
 tauri = { version = "2.12.7", features = ["tray-icon"] }
@@ -24,5 +24,10 @@ rusqlite = { version = "0.43", features = ["bundled"] }
 uuid = { version = "1.15", features = ["v4", "serde"] }
 chrono = { version = "0.4", features = ["serde"] }
 url = "2.5"
-windows = { version = "0.62", features = ["Win32_UI_Shell", "Win32_Foundation"] }
+windows = { version = "0.62", features = [
+    "Win32_UI_Shell",
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_System_Threading"
+] }
 log = "0.4"

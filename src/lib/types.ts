@@ -163,3 +163,9 @@ export interface AppSettings {
   showLaunchToast: boolean;
   dataDirectory: string;
 }
+
+export interface CapturedWindowApp {
+  name: string;
+  executablePath: string;
+  windowTitle: string;
+}

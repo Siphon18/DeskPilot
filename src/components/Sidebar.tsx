@@ -1,9 +1,9 @@
 import React from 'react';
-import { LayoutDashboard, Layers, History, Settings, ShieldCheck } from 'lucide-react';
+import { Home, LayoutGrid, FileText, Settings, Info, Navigation } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './Sidebar.module.css';
 
-export type NavTab = 'overview' | 'workspaces' | 'activity' | 'settings';
+export type NavTab = 'overview' | 'workspaces' | 'notes' | 'settings' | 'about';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -14,7 +14,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
   return (
     <aside className={styles.sidebar}>
       <div className={styles.brand}>
-        <div className={styles.brandIcon}>D</div>
+        <div className={styles.brandIconWrapper}>
+          <Navigation size={18} className={styles.brandIcon} />
+        </div>
         <span className={styles.brandTitle}>DeskPilot</span>
       </div>
 
@@ -23,28 +25,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
           className={clsx(styles.navItem, currentTab === 'overview' && styles.navItemActive)}
           onClick={() => onSelectTab('overview')}
         >
-          <LayoutDashboard size={18} />
-          <span>Overview</span>
+          <Home size={18} />
+          <span>Home</span>
         </button>
 
         <button
           className={clsx(styles.navItem, currentTab === 'workspaces' && styles.navItemActive)}
           onClick={() => onSelectTab('workspaces')}
         >
-          <Layers size={18} />
+          <LayoutGrid size={18} />
           <span>Workspaces</span>
         </button>
 
         <button
-          className={clsx(styles.navItem, currentTab === 'activity' && styles.navItemActive)}
-          onClick={() => onSelectTab('activity')}
+          className={clsx(styles.navItem, currentTab === 'notes' && styles.navItemActive)}
+          onClick={() => onSelectTab('notes')}
         >
-          <History size={18} />
-          <span>Activity</span>
+          <FileText size={18} />
+          <span>Quick Notes</span>
         </button>
-      </nav>
 
-      <div className={styles.footer}>
         <button
           className={clsx(styles.navItem, currentTab === 'settings' && styles.navItemActive)}
           onClick={() => onSelectTab('settings')}
@@ -53,9 +53,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
           <span>Settings</span>
         </button>
 
-        <div className={styles.localBadge} title="Your workspace data stays on this PC">
-          <ShieldCheck size={14} className={styles.localDotIcon} />
-          <span>Local-first storage</span>
+        <button
+          className={clsx(styles.navItem, currentTab === 'about' && styles.navItemActive)}
+          onClick={() => onSelectTab('about')}
+        >
+          <Info size={18} />
+          <span>About</span>
+        </button>
+      </nav>
+
+      <div className={styles.footer}>
+        <div className={styles.statusCard}>
+          <div className={styles.statusHeader}>
+            <span className={styles.statusDot} />
+            <span className={styles.statusTitle}>All Set!</span>
+          </div>
+          <p className={styles.statusSubtitle}>Ready to launch your workspace</p>
         </div>
       </div>
     </aside>

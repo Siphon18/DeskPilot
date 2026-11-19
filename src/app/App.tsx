@@ -5,8 +5,9 @@ import { Sidebar, type NavTab } from '../components/Sidebar';
 import { OverviewView } from '../features/overview/OverviewView';
 import { WorkspacesView } from '../features/workspaces/WorkspacesView';
 import { WorkspaceDetailView } from '../features/workspaces/WorkspaceDetailView';
-import { ActivityView } from '../features/activity/ActivityView';
+import { QuickNotesView } from '../features/notes/QuickNotesView';
 import { SettingsView } from '../features/settings/SettingsView';
+import { AboutView } from '../features/about/AboutView';
 import { WorkspaceModal } from '../components/WorkspaceModal';
 import { DeleteModal } from '../components/DeleteModal';
 import { LaunchModal } from '../components/LaunchModal';
@@ -32,7 +33,7 @@ export const App: React.FC = () => {
   const [activeLaunchRun, setActiveLaunchRun] = useState<{ runId: string; workspaceName: string } | null>(null);
 
   // Theme state
-  const [theme, setTheme] = useState<'system' | 'light' | 'dark'>('system');
+  const [theme, setTheme] = useState<'system' | 'light' | 'dark'>('dark');
   const { showToast } = useToast();
 
   // Load workspaces from Rust SQLite
@@ -51,7 +52,7 @@ export const App: React.FC = () => {
     loadWorkspaces();
   }, [loadWorkspaces]);
 
-  // Global shortcut listener from Rust (Ctrl+Alt+Space)
+  // Global shortcut listener from Rust (Ctrl+Space / Ctrl+Alt+Space)
   useEffect(() => {
     let unlisten: (() => void) | null = null;
     onQuickSwitcherShow(() => {
@@ -65,16 +66,32 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  // In-app keyboard shortcuts: Ctrl+K (Quick Switcher), Ctrl+N (New Workspace)
+  // Workspace 1-Click Desktop Capture Handler
+  const handleCaptureCurrent = async () => {
+    try {
+      const created = await desktopApi.workspaces.captureCurrent();
+      showToast(`Captured workspace "${created.name}" with ${created.items.length} apps!`, 'success');
+      await loadWorkspaces();
+    } catch (err: any) {
+      showToast(err.message || 'Failed to capture desktop workspace', 'error');
+    }
+  };
+
+  // In-app keyboard shortcuts: Ctrl+Space / Ctrl+K (Quick Switcher), Ctrl+Shift+C (Capture)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is typing in an input or textarea
       const target = e.target as HTMLElement | null;
       const isInput = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA');
 
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      if ((e.ctrlKey || e.metaKey) && e.code === 'Space') {
         e.preventDefault();
         setIsQuickSwitcherOpen((prev) => !prev);
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsQuickSwitcherOpen((prev) => !prev);
+      } else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'c' && !isInput) {
+        e.preventDefault();
+        handleCaptureCurrent();
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n' && !isInput) {
         e.preventDefault();
         handleOpenCreate();
@@ -182,6 +199,25 @@ export const App: React.FC = () => {
       <Sidebar currentTab={currentTab} onSelectTab={handleSelectTab} />
 
       <main className={styles.mainContent}>
+        {/* Custom Window Titlebar row */}
+        <div className={styles.windowTitleBar}>
+          <div className={styles.titleBarLeft}>
+            <button
+              className={styles.quickLauncherTriggerBtn}
+              onClick={() => setIsQuickSwitcherOpen(true)}
+              title="Open Quick Launcher (Ctrl + Space)"
+            >
+              <span>Quick Launcher</span>
+              <span className={styles.quickLauncherKbd}>Ctrl + Space</span>
+            </button>
+          </div>
+          <div className={styles.windowControls}>
+            <span className={styles.controlBtn} title="Minimize">&#x2014;</span>
+            <span className={styles.controlBtn} title="Maximize">&#x25A1;</span>
+            <span className={`${styles.controlBtn} ${styles.controlClose}`} title="Close">&#x2715;</span>
+          </div>
+        </div>
+
         {isLoading ? (
           <div className={styles.loadingContainer}>
             <div className={styles.spinner} />
@@ -207,6 +243,8 @@ export const App: React.FC = () => {
                 onDelete={setWorkspaceToDelete}
                 onToggleFavorite={handleToggleFavorite}
                 onOpenDetail={(id) => setSelectedWorkspaceId(id)}
+                onCaptureCurrent={handleCaptureCurrent}
+                onNavigateTab={handleSelectTab}
               />
             )}
 
@@ -223,10 +261,16 @@ export const App: React.FC = () => {
               />
             )}
 
-            {currentTab === 'activity' && <ActivityView />}
+            {currentTab === 'notes' && (
+              <QuickNotesView workspaces={workspaces} />
+            )}
 
             {currentTab === 'settings' && (
               <SettingsView currentTheme={theme} onThemeChange={setTheme} />
+            )}
+
+            {currentTab === 'about' && (
+              <AboutView />
             )}
           </>
         )}
@@ -257,12 +301,15 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* Quick Switcher Overlay */}
+      {/* Quick Switcher / Quick Launcher Overlay */}
       <QuickSwitcher
         isOpen={isQuickSwitcherOpen}
         onClose={() => setIsQuickSwitcherOpen(false)}
         workspaces={workspaces}
         onLaunch={handleLaunch}
+        onOpenNotes={() => handleSelectTab('notes')}
+        onOpenSettings={() => handleSelectTab('settings')}
+        onCaptureCurrent={handleCaptureCurrent}
       />
     </div>
   );
