@@ -33,6 +33,19 @@ pub fn run() {
                 let _ = database::repositories::launch_repo::prune_old_runs(&conn);
             }
 
+            // Apply Windows 11 Mica / Acrylic native liquid glass effect
+            #[cfg(target_os = "windows")]
+            {
+                if let Some(window) = app.get_webview_window("main") {
+                    use window_vibrancy::{apply_mica, apply_acrylic};
+                    // Attempt Windows 11 native Mica effect (dark mode)
+                    if apply_mica(&window, Some(true)).is_err() {
+                        // Fallback to Windows 10/11 Acrylic
+                        let _ = apply_acrylic(&window, Some((17, 21, 27, 210)));
+                    }
+                }
+            }
+
             // Register default global shortcut Ctrl+Space (or Ctrl+Alt+Space fallback)
             let shortcut_res = "ctrl+space".parse::<Shortcut>();
             let shortcut = match shortcut_res {

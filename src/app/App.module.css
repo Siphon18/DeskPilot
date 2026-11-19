@@ -3,7 +3,12 @@
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background-color: var(--bg-app);
+  background: 
+    var(--liquid-aura-primary),
+    var(--liquid-aura-secondary),
+    var(--bg-app);
+  backdrop-filter: var(--liquid-blur);
+  -webkit-backdrop-filter: var(--liquid-blur);
 }
 
 .mainContent {
