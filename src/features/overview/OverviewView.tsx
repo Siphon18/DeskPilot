@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
-import { Plus, Zap, FileText, FolderOpen, Settings, ChevronRight, Code2, Camera } from 'lucide-react';
-import type { WorkspaceDTO } from '../../lib/types';
+import React, { useState, useEffect } from 'react';
+import { Plus, Camera, Star, Layers, History, Clock, Zap, Settings, ArrowRight } from 'lucide-react';
+import type { WorkspaceDTO, LaunchRunDTO } from '../../lib/types';
+import { desktopApi } from '../../lib/desktop-api';
 import { WorkspaceCard } from '../../components/WorkspaceCard';
 import styles from './OverviewView.module.css';
 
@@ -8,19 +9,21 @@ interface OverviewViewProps {
   workspaces: WorkspaceDTO[];
   onOpenCreate: () => void;
   onLaunch: (id: string) => void;
+  onLaunchLast?: () => void;
   onEdit: (workspace: WorkspaceDTO) => void;
   onDuplicate: (id: string) => void;
   onDelete: (workspace: WorkspaceDTO) => void;
   onToggleFavorite: (id: string, current: boolean) => void;
   onOpenDetail: (id: string) => void;
   onCaptureCurrent: () => Promise<void>;
-  onNavigateTab: (tab: 'overview' | 'workspaces' | 'notes' | 'settings' | 'about') => void;
+  onNavigateTab: (tab: 'overview' | 'workspaces' | 'activity' | 'settings') => void;
 }
 
 export const OverviewView: React.FC<OverviewViewProps> = ({
   workspaces,
   onOpenCreate,
   onLaunch,
+  onLaunchLast,
   onEdit,
   onDuplicate,
   onDelete,
@@ -29,214 +32,234 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   onCaptureCurrent,
   onNavigateTab,
 }) => {
-  // Determine dynamic greeting
-  const greeting = useMemo(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning!';
-    if (hour < 18) return 'Good Afternoon!';
-    return 'Good Evening!';
-  }, []);
+  const [recentRuns, setRecentRuns] = useState<LaunchRunDTO[]>([]);
+  const favorites = workspaces.filter((w) => w.isFavorite);
 
-  const handleLaunchLast = () => {
-    if (workspaces.length === 0) return;
-    const sorted = [...workspaces].sort((a, b) => {
-      if (!a.lastLaunchedAt) return 1;
-      if (!b.lastLaunchedAt) return -1;
-      return new Date(b.lastLaunchedAt).getTime() - new Date(a.lastLaunchedAt).getTime();
+  // Load actual launch runs from SQLite
+  useEffect(() => {
+    desktopApi.launch.listRuns(5).then((runs) => {
+      setRecentRuns(runs || []);
+    }).catch(() => {
+      setRecentRuns([]);
     });
-    onLaunch(sorted[0].id);
+  }, [workspaces]);
+
+  const formatRunTime = (iso: string) => {
+    const d = new Date(iso);
+    const now = new Date();
+    const diffSec = Math.floor((now.getTime() - d.getTime()) / 1000);
+    if (diffSec < 60) return 'Just now';
+    if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
+    if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   };
 
   return (
     <div className={styles.container}>
-      {/* Hero Banner with illustration */}
-      <div className={styles.heroBanner}>
-        <div className={styles.heroContent}>
-          <h1 className={styles.heroTitle}>{greeting}</h1>
-          <p className={styles.heroSubtitle}>What would you like to work on today?</p>
+      {/* Header row (Section 6.6) */}
+      <div className={styles.header}>
+        <div className={styles.headingArea}>
+          <h1 className={styles.title}>Your Workspaces</h1>
+          <p className={styles.subtitle}>Launch the apps and resources for a task in one click.</p>
         </div>
 
-        {/* 3D-styled Laptop & Plant Visual Graphic matching reference */}
-        <div className={styles.heroIllustration}>
-          <div className={styles.plantWrapper}>
-            <div className={styles.plantPot}>
-              <div className={styles.leaf1} />
-              <div className={styles.leaf2} />
-              <div className={styles.leaf3} />
-            </div>
-          </div>
+        <div className={styles.headerActions}>
+          <button
+            className={styles.secondaryBtn}
+            onClick={onCaptureCurrent}
+            title="Snapshot currently open visible user applications into a workspace in one click (Ctrl+Shift+C)"
+          >
+            <Camera size={15} />
+            <span>Capture desktop</span>
+          </button>
 
-          <div className={styles.laptopWrapper}>
-            <div className={styles.laptopScreen}>
-              <div className={styles.screenGlow} />
-              <div className={styles.winLogo}>
-                <div className={styles.winTile} />
-                <div className={styles.winTile} />
-                <div className={styles.winTile} />
-                <div className={styles.winTile} />
-              </div>
-            </div>
-            <div className={styles.laptopBase} />
-          </div>
+          <button className={styles.primaryBtn} onClick={onOpenCreate}>
+            <Plus size={16} />
+            <span>New workspace</span>
+          </button>
         </div>
       </div>
 
-      {/* Your Workspaces Section */}
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Your Workspaces</h2>
-
-          <div className={styles.headerButtons}>
-            <button
-              className={styles.captureBtn}
-              onClick={onCaptureCurrent}
-              title="Capture open application windows and save as a workspace with 1 click"
-            >
-              <Camera size={15} />
-              <span>1-Click Capture Desktop</span>
-            </button>
-
+      {workspaces.length === 0 ? (
+        /* Empty State (Section 6.6) */
+        <div className={styles.emptyState}>
+          <div className={styles.emptyIconBox}>
+            <Layers size={28} strokeWidth={1.5} />
+          </div>
+          <h2 className={styles.emptyTitle}>No workspaces created yet</h2>
+          <p className={styles.emptyText}>
+            DeskPilot organizes your daily apps, project folders, web URLs, and terminals into fast one-click workspaces.
+          </p>
+          <div className={styles.emptyActions}>
             <button className={styles.primaryBtn} onClick={onOpenCreate}>
               <Plus size={16} />
-              <span>New Workspace</span>
+              <span>Create workspace</span>
+            </button>
+            <button className={styles.secondaryBtn} onClick={onCaptureCurrent}>
+              <Camera size={15} />
+              <span>Capture desktop</span>
             </button>
           </div>
         </div>
-
-        {workspaces.length === 0 ? (
-          <div className={styles.emptyStateCard}>
-            <p className={styles.emptyTitle}>No workspaces yet</p>
-            <p className={styles.emptyText}>
-              Click <strong>1-Click Capture Desktop</strong> to snapshot all currently open apps, or click <strong>New Workspace</strong> to start fresh.
-            </p>
-          </div>
-        ) : (
-          <div className={styles.grid}>
-            {workspaces.map((w) => (
-              <WorkspaceCard
-                key={w.id}
-                workspace={w}
-                onLaunch={onLaunch}
-                onEdit={onEdit}
-                onDuplicate={onDuplicate}
-                onDelete={onDelete}
-                onToggleFavorite={onToggleFavorite}
-                onOpenDetail={onOpenDetail}
-              />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Quick Actions Row */}
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Quick Actions</h2>
-        </div>
-
-        <div className={styles.quickActionsGrid}>
-          <div className={styles.actionCard} onClick={handleLaunchLast}>
-            <div className={`${styles.actionIconBox} ${styles.amberIcon}`}>
-              <Zap size={18} fill="currentColor" />
-            </div>
-            <div className={styles.actionDetails}>
-              <span className={styles.actionName}>Launch Last Workspace</span>
-              <div className={styles.actionKbdRow}>
-                <span className={styles.actionKbd}>Ctrl</span>
-                <span className={styles.actionKbd}>+</span>
-                <span className={styles.actionKbd}>Shift</span>
-                <span className={styles.actionKbd}>+</span>
-                <span className={styles.actionKbd}>L</span>
+      ) : (
+        <>
+          {/* 1. Favorites, only if at least one workspace is favorited */}
+          {favorites.length > 0 && (
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>
+                  <Star size={15} className={styles.sectionIcon} />
+                  <span>Favorites</span>
+                  <span className={styles.counterBadge}>{favorites.length}</span>
+                </h2>
               </div>
-            </div>
-          </div>
-
-          <div className={styles.actionCard} onClick={() => onNavigateTab('notes')}>
-            <div className={`${styles.actionIconBox} ${styles.yellowIcon}`}>
-              <FileText size={18} />
-            </div>
-            <div className={styles.actionDetails}>
-              <span className={styles.actionName}>Add Note</span>
-              <div className={styles.actionKbdRow}>
-                <span className={styles.actionKbd}>Ctrl</span>
-                <span className={styles.actionKbd}>+</span>
-                <span className={styles.actionKbd}>N</span>
+              <div className={styles.grid}>
+                {favorites.map((w) => (
+                  <WorkspaceCard
+                    key={w.id}
+                    workspace={w}
+                    onLaunch={onLaunch}
+                    onEdit={onEdit}
+                    onDuplicate={onDuplicate}
+                    onDelete={onDelete}
+                    onToggleFavorite={onToggleFavorite}
+                    onOpenDetail={onOpenDetail}
+                  />
+                ))}
               </div>
-            </div>
-          </div>
+            </section>
+          )}
 
-          <div
-            className={styles.actionCard}
-            onClick={() => onNavigateTab('workspaces')}
-          >
-            <div className={`${styles.actionIconBox} ${styles.goldIcon}`}>
-              <FolderOpen size={18} />
+          {/* 2. All workspaces */}
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>
+                <span>All workspaces</span>
+                <span className={styles.counterBadge}>{workspaces.length}</span>
+              </h2>
             </div>
-            <div className={styles.actionDetails}>
-              <span className={styles.actionName}>Open Folder</span>
-              <div className={styles.actionKbdRow}>
-                <span className={styles.actionKbd}>Ctrl</span>
-                <span className={styles.actionKbd}>+</span>
-                <span className={styles.actionKbd}>O</span>
+            <div className={styles.grid}>
+              {workspaces.map((w) => (
+                <WorkspaceCard
+                  key={w.id}
+                  workspace={w}
+                  onLaunch={onLaunch}
+                  onEdit={onEdit}
+                  onDuplicate={onDuplicate}
+                  onDelete={onDelete}
+                  onToggleFavorite={onToggleFavorite}
+                  onOpenDetail={onOpenDetail}
+                />
+              ))}
+            </div>
+          </section>
+
+          {/* 3. Quick Actions Row (Mockup Reference: Launch Last, Capture, New, Settings) */}
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>
+                <Zap size={15} className={styles.sectionIcon} />
+                <span>Quick Actions</span>
+              </h2>
+            </div>
+            <div className={styles.quickActionsGrid}>
+              <button
+                className={styles.quickActionCard}
+                onClick={onLaunchLast}
+                title="Launch the most recently launched workspace (Ctrl + Shift + L)"
+              >
+                <div className={`${styles.quickActionIcon} ${styles.quickActionIconZap}`}>
+                  <Zap size={16} />
+                </div>
+                <div className={styles.quickActionText}>
+                  <span className={styles.quickActionTitle}>Launch Last Workspace</span>
+                  <span className={styles.quickActionShortcut}>Ctrl + Shift + L</span>
+                </div>
+              </button>
+
+              <button
+                className={styles.quickActionCard}
+                onClick={onCaptureCurrent}
+                title="Snapshot open windows into a new workspace (Ctrl + Shift + C)"
+              >
+                <div className={`${styles.quickActionIcon} ${styles.quickActionIconCamera}`}>
+                  <Camera size={16} />
+                </div>
+                <div className={styles.quickActionText}>
+                  <span className={styles.quickActionTitle}>Capture Desktop</span>
+                  <span className={styles.quickActionShortcut}>Ctrl + Shift + C</span>
+                </div>
+              </button>
+
+              <button
+                className={styles.quickActionCard}
+                onClick={onOpenCreate}
+                title="Create a custom workspace (Ctrl + N)"
+              >
+                <div className={`${styles.quickActionIcon} ${styles.quickActionIconPlus}`}>
+                  <Plus size={16} />
+                </div>
+                <div className={styles.quickActionText}>
+                  <span className={styles.quickActionTitle}>New Workspace</span>
+                  <span className={styles.quickActionShortcut}>Ctrl + N</span>
+                </div>
+              </button>
+
+              <button
+                className={styles.quickActionCard}
+                onClick={() => onNavigateTab('settings')}
+                title="Configure DeskPilot settings (Ctrl + ,)"
+              >
+                <div className={`${styles.quickActionIcon} ${styles.quickActionIconSettings}`}>
+                  <Settings size={16} />
+                </div>
+                <div className={styles.quickActionText}>
+                  <span className={styles.quickActionTitle}>Settings</span>
+                  <span className={styles.quickActionShortcut}>Ctrl + ,</span>
+                </div>
+              </button>
+            </div>
+          </section>
+
+          {/* 4. Recent launches, backed by SQLite launch runs */}
+          {recentRuns.length > 0 && (
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>
+                  <History size={15} className={styles.sectionIcon} />
+                  <span>Recent Activity</span>
+                </h2>
+                <button
+                  className={styles.viewHistoryLink}
+                  onClick={() => onNavigateTab('activity')}
+                >
+                  <span>View All</span>
+                  <ArrowRight size={13} />
+                </button>
               </div>
-            </div>
-          </div>
 
-          <div className={styles.actionCard} onClick={() => onNavigateTab('settings')}>
-            <div className={`${styles.actionIconBox} ${styles.blueIcon}`}>
-              <Settings size={18} />
-            </div>
-            <div className={styles.actionDetails}>
-              <span className={styles.actionName}>Settings</span>
-              <div className={styles.actionKbdRow}>
-                <span className={styles.actionKbd}>Ctrl</span>
-                <span className={styles.actionKbd}>+</span>
-                <span className={styles.actionKbd}>,</span>
+              <div className={styles.recentList}>
+                {recentRuns.map((run) => (
+                  <div key={run.id} className={styles.recentRow}>
+                    <div className={styles.recentInfo}>
+                      <span className={styles.recentWorkspaceName}>
+                        {run.workspaceNameSnapshot}
+                      </span>
+                      <span className={styles.recentCounts}>
+                        {run.successCount} of {run.totalCount} items launched
+                      </span>
+                    </div>
+                    <div className={styles.recentMeta}>
+                      <Clock size={12} />
+                      <span>{formatRunTime(run.startedAt)}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Recent Activity Row */}
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Recent Activity</h2>
-          <button
-            className={styles.viewAllBtn}
-            onClick={() => onNavigateTab('about')}
-          >
-            <span>View All</span>
-            <ChevronRight size={14} />
-          </button>
-        </div>
-
-        <div className={styles.activityList}>
-          <div className={styles.activityItem}>
-            <div className={`${styles.activityIconBox} ${styles.activityBlue}`}>
-              <Code2 size={15} />
-            </div>
-            <span className={styles.activityText}>Opened Development workspace</span>
-            <span className={styles.activityTime}>2m ago</span>
-          </div>
-
-          <div className={styles.activityItem}>
-            <div className={`${styles.activityIconBox} ${styles.activityPurple}`}>
-              <FileText size={15} />
-            </div>
-            <span className={styles.activityText}>Added note: "API integration ideas"</span>
-            <span className={styles.activityTime}>12m ago</span>
-          </div>
-
-          <div className={styles.activityItem}>
-            <div className={`${styles.activityIconBox} ${styles.activityGreen}`}>
-              <FolderOpen size={15} />
-            </div>
-            <span className={styles.activityText}>Launched: C:\Users\Projects</span>
-            <span className={styles.activityTime}>1h ago</span>
-          </div>
-        </div>
-      </section>
+            </section>
+          )}
+        </>
+      )}
     </div>
   );
 };

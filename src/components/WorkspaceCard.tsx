@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Star, MoreVertical, Copy, Trash2, Edit3, Folder, Code2, GraduationCap, Briefcase, Layers } from 'lucide-react';
+import { Play, Star, MoreVertical, Copy, Trash2, Edit3, Folder, Clock, Layers, Code2, GraduationCap, Briefcase } from 'lucide-react';
 import type { WorkspaceDTO } from '../lib/types';
 import styles from './WorkspaceCard.module.css';
 
@@ -25,7 +25,7 @@ export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Close menu on click outside
+  // Close overflow menu on outside click
   useEffect(() => {
     if (!menuOpen) return;
     const handleClickOutside = (e: MouseEvent) => {
@@ -37,53 +37,62 @@ export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [menuOpen]);
 
-  const getWorkspaceColor = () => {
-    const lowerName = workspace.name.toLowerCase();
-    if (lowerName.includes('dev') || lowerName.includes('code') || workspace.color === 'blue' || workspace.color === '#3b82f6') {
-      return '#38bdf8';
-    }
-    if (lowerName.includes('study') || lowerName.includes('learn') || workspace.color === 'purple' || workspace.color === '#8b5cf6') {
-      return '#a855f7';
-    }
-    if (lowerName.includes('job') || lowerName.includes('work') || workspace.color === 'green' || workspace.color === '#10b981') {
-      return '#10b981';
-    }
-    if (workspace.color === 'orange' || workspace.color === '#f97316') return '#fb923c';
-    if (workspace.color === 'pink' || workspace.color === '#ec4899') return '#f472b6';
-    return '#3b82f6';
+  const formatLastLaunched = (iso: string | null) => {
+    if (!iso) return null;
+    const date = new Date(iso);
+    const now = new Date();
+    const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000);
+    if (diffSec < 60) return 'Just now';
+    if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
+    if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   };
 
-  const getCardIcon = () => {
-    const lowerName = workspace.name.toLowerCase();
-    if (lowerName.includes('dev') || lowerName.includes('code') || workspace.icon === 'code' || workspace.icon === 'terminal') {
-      return <Code2 size={20} />;
+  const getWorkspaceCategory = () => {
+    const lower = workspace.name.toLowerCase();
+    if (lower.includes('dev') || lower.includes('code') || workspace.icon === 'code' || workspace.icon === 'terminal') {
+      return { icon: <Code2 size={18} strokeWidth={2} />, typeClass: styles.iconDev };
     }
-    if (lowerName.includes('study') || lowerName.includes('learn') || workspace.icon === 'book' || workspace.icon === 'graduation-cap') {
-      return <GraduationCap size={20} />;
+    if (lower.includes('study') || lower.includes('learn') || workspace.icon === 'book' || workspace.icon === 'graduation-cap') {
+      return { icon: <GraduationCap size={18} strokeWidth={2} />, typeClass: styles.iconStudy };
     }
-    if (lowerName.includes('job') || lowerName.includes('work') || workspace.icon === 'briefcase') {
-      return <Briefcase size={20} />;
+    if (lower.includes('job') || lower.includes('work') || workspace.icon === 'briefcase') {
+      return { icon: <Briefcase size={18} strokeWidth={2} />, typeClass: styles.iconWork };
     }
-    return <Layers size={20} />;
+    return { icon: <Layers size={18} strokeWidth={2} />, typeClass: styles.iconDefault };
   };
 
-  const accentColor = getWorkspaceColor();
+  // Derive apps preview (e.g. "VS Code · Browser · Terminal") matching design mockup
+  const getItemSubtitle = () => {
+    if (workspace.items && workspace.items.length > 0) {
+      return workspace.items.map((i) => i.name).filter(Boolean).slice(0, 3).join(' · ');
+    }
+    return workspace.description || `${workspace.itemCount} ${workspace.itemCount === 1 ? 'item' : 'items'}`;
+  };
+
+  const { icon, typeClass } = getWorkspaceCategory();
+  const lastLaunched = formatLastLaunched(workspace.lastLaunchedAt);
+  const subtitle = getItemSubtitle();
 
   return (
     <div
       className={styles.card}
       onClick={() => onOpenDetail?.(workspace.id)}
-      style={{ borderLeft: `3px solid ${accentColor}` }}
     >
+      {/* Top Header: Identity Icon, Title, Subtitle, Favorite & Overflow Menu */}
       <div className={styles.cardHeader}>
-        <div
-          className={styles.iconBox}
-          style={{
-            backgroundColor: `${accentColor}1c`,
-            color: accentColor,
-          }}
-        >
-          {getCardIcon()}
+        <div className={styles.iconAndTitle}>
+          <div className={`${styles.iconBox} ${typeClass}`}>
+            {icon}
+          </div>
+          <div className={styles.titleArea}>
+            <h3 className={styles.title} title={workspace.name}>
+              {workspace.name}
+            </h3>
+            <p className={styles.subtitle} title={subtitle}>
+              {subtitle}
+            </p>
+          </div>
         </div>
 
         <div className={styles.headerActions} ref={menuRef} onClick={(e) => e.stopPropagation()}>
@@ -96,7 +105,11 @@ export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({
             title={workspace.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
             aria-label="Favorite toggle"
           >
-            <Star size={16} fill={workspace.isFavorite ? '#ffaa00' : 'none'} color={workspace.isFavorite ? '#ffaa00' : '#64748b'} />
+            <Star
+              size={15}
+              fill={workspace.isFavorite ? 'currentColor' : 'none'}
+              strokeWidth={1.8}
+            />
           </button>
 
           <button
@@ -108,7 +121,7 @@ export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({
             title="More options"
             aria-label="Workspace options"
           >
-            <MoreVertical size={16} />
+            <MoreVertical size={16} strokeWidth={1.8} />
           </button>
 
           {menuOpen && (
@@ -121,7 +134,7 @@ export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({
                 }}
               >
                 <Edit3 size={14} />
-                <span>Edit details</span>
+                <span>Edit</span>
               </button>
 
               <button
@@ -150,31 +163,33 @@ export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({
         </div>
       </div>
 
-      <div className={styles.contentArea}>
-        <h3 className={styles.title} title={workspace.name}>
-          {workspace.name}
-        </h3>
-        <p className={styles.subtitle} title={workspace.description}>
-          {workspace.description || (workspace.itemCount > 0 ? `${workspace.itemCount} items configured` : 'Ready to launch')}
-        </p>
-      </div>
-
+      {/* Footer: Metadata (item count, last launched) & Clear Launch Button */}
       <div className={styles.cardFooter}>
-        <div className={styles.itemBadge}>
-          <Folder size={12} className={styles.itemBadgeIcon} />
-          <span>{workspace.itemCount} {workspace.itemCount === 1 ? 'item' : 'items'}</span>
+        <div className={styles.metaRow}>
+          <span className={styles.itemBadge}>
+            <Folder size={13} strokeWidth={1.8} />
+            <span>{workspace.itemCount} {workspace.itemCount === 1 ? 'item' : 'items'}</span>
+          </span>
+
+          {lastLaunched && (
+            <span className={styles.lastLaunched} title={workspace.lastLaunchedAt || undefined}>
+              <Clock size={12} strokeWidth={1.8} />
+              <span>{lastLaunched}</span>
+            </span>
+          )}
         </div>
 
         <button
-          className={styles.playButton}
+          className={styles.launchBtn}
           onClick={(e) => {
             e.stopPropagation();
             onLaunch(workspace.id);
           }}
-          title={`Launch ${workspace.name} (1-click)`}
+          title={`Launch ${workspace.name}`}
           aria-label={`Launch ${workspace.name}`}
         >
-          <Play size={14} fill="#ffffff" color="#ffffff" />
+          <Play size={12} fill="currentColor" strokeWidth={0} />
+          <span>Launch</span>
         </button>
       </div>
     </div>

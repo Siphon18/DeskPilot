@@ -1,9 +1,9 @@
 import React from 'react';
-import { Home, LayoutGrid, FileText, Settings, Info, Navigation } from 'lucide-react';
+import { Layers, LayoutGrid, History, Settings, ShieldCheck, Compass } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './Sidebar.module.css';
 
-export type NavTab = 'overview' | 'workspaces' | 'notes' | 'settings' | 'about';
+export type NavTab = 'overview' | 'workspaces' | 'activity' | 'settings';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -13,62 +13,54 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => {
   return (
     <aside className={styles.sidebar}>
+      {/* Brand header */}
       <div className={styles.brand}>
-        <div className={styles.brandIconWrapper}>
-          <Navigation size={18} className={styles.brandIcon} />
+        <div className={styles.brandMark}>
+          <Compass size={17} strokeWidth={2} />
         </div>
         <span className={styles.brandTitle}>DeskPilot</span>
       </div>
 
-      <nav className={styles.nav}>
+      {/* Primary Navigation */}
+      <nav className={styles.nav} aria-label="Main navigation">
         <button
           className={clsx(styles.navItem, currentTab === 'overview' && styles.navItemActive)}
           onClick={() => onSelectTab('overview')}
         >
-          <Home size={18} />
-          <span>Home</span>
+          <Layers size={17} strokeWidth={1.8} />
+          <span>Overview</span>
         </button>
 
         <button
           className={clsx(styles.navItem, currentTab === 'workspaces' && styles.navItemActive)}
           onClick={() => onSelectTab('workspaces')}
         >
-          <LayoutGrid size={18} />
+          <LayoutGrid size={17} strokeWidth={1.8} />
           <span>Workspaces</span>
         </button>
 
         <button
-          className={clsx(styles.navItem, currentTab === 'notes' && styles.navItemActive)}
-          onClick={() => onSelectTab('notes')}
+          className={clsx(styles.navItem, currentTab === 'activity' && styles.navItemActive)}
+          onClick={() => onSelectTab('activity')}
         >
-          <FileText size={18} />
-          <span>Quick Notes</span>
+          <History size={17} strokeWidth={1.8} />
+          <span>Activity</span>
         </button>
+      </nav>
 
+      {/* Bottom Anchored Section: Settings & Local Status */}
+      <div className={styles.footer}>
         <button
           className={clsx(styles.navItem, currentTab === 'settings' && styles.navItemActive)}
           onClick={() => onSelectTab('settings')}
         >
-          <Settings size={18} />
+          <Settings size={17} strokeWidth={1.8} />
           <span>Settings</span>
         </button>
 
-        <button
-          className={clsx(styles.navItem, currentTab === 'about' && styles.navItemActive)}
-          onClick={() => onSelectTab('about')}
-        >
-          <Info size={18} />
-          <span>About</span>
-        </button>
-      </nav>
-
-      <div className={styles.footer}>
-        <div className={styles.statusCard}>
-          <div className={styles.statusHeader}>
-            <span className={styles.statusDot} />
-            <span className={styles.statusTitle}>All Set!</span>
-          </div>
-          <p className={styles.statusSubtitle}>Ready to launch your workspace</p>
+        <div className={styles.statusLine} title="All workspace data stays strictly on this machine">
+          <ShieldCheck size={13} className={styles.statusIcon} strokeWidth={2} />
+          <span>Stored on this PC</span>
         </div>
       </div>
     </aside>

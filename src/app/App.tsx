@@ -5,9 +5,8 @@ import { Sidebar, type NavTab } from '../components/Sidebar';
 import { OverviewView } from '../features/overview/OverviewView';
 import { WorkspacesView } from '../features/workspaces/WorkspacesView';
 import { WorkspaceDetailView } from '../features/workspaces/WorkspaceDetailView';
-import { QuickNotesView } from '../features/notes/QuickNotesView';
+import { ActivityView } from '../features/activity/ActivityView';
 import { SettingsView } from '../features/settings/SettingsView';
-import { AboutView } from '../features/about/AboutView';
 import { WorkspaceModal } from '../components/WorkspaceModal';
 import { DeleteModal } from '../components/DeleteModal';
 import { LaunchModal } from '../components/LaunchModal';
@@ -32,8 +31,8 @@ export const App: React.FC = () => {
   // Live Launch state
   const [activeLaunchRun, setActiveLaunchRun] = useState<{ runId: string; workspaceName: string } | null>(null);
 
-  // Theme state
-  const [theme, setTheme] = useState<'system' | 'light' | 'dark'>('dark');
+  // Theme state: Default to system per Section 6.4
+  const [theme, setTheme] = useState<'system' | 'light' | 'dark'>('system');
   const { showToast } = useToast();
 
   // Load workspaces from Rust SQLite
@@ -61,7 +60,7 @@ export const App: React.FC = () => {
       root.style.setProperty('--win-accent-glow', color.accentGlow);
       root.style.setProperty('--win-accent-subtle', color.accentSubtle);
       root.style.setProperty('--win-accent-highlight', color.liquidHighlight);
-      root.style.setProperty('--win-accent-border', `rgba(${color.r}, ${color.g}, ${color.b}, 0.35)`);
+      root.style.setProperty('--win-accent-border', `rgba(${color.r}, ${color.g}, ${color.b}, 0.3)`);
     }).catch((err) => {
       console.warn('Could not query Windows theme color:', err);
     });
@@ -85,14 +84,34 @@ export const App: React.FC = () => {
   const handleCaptureCurrent = async () => {
     try {
       const created = await desktopApi.workspaces.captureCurrent();
-      showToast(`Captured workspace "${created.name}" with ${created.items.length} apps!`, 'success');
+      showToast(`Captured workspace "${created.name}" with ${created.items.length} apps`, 'success');
       await loadWorkspaces();
     } catch (err: any) {
       showToast(err.message || 'Failed to capture desktop workspace', 'error');
     }
   };
 
-  // In-app keyboard shortcuts: Ctrl+Space / Ctrl+K (Quick Switcher), Ctrl+Shift+C (Capture)
+  // Launch the most recently launched workspace (Ctrl + Shift + L)
+  const handleLaunchLast = useCallback(async () => {
+    if (workspaces.length === 0) {
+      showToast('No workspaces available to launch', 'info');
+      return;
+    }
+    // Sort by lastLaunchedAt descending
+    const sorted = [...workspaces].sort((a, b) => {
+      if (!a.lastLaunchedAt && !b.lastLaunchedAt) return 0;
+      if (!a.lastLaunchedAt) return 1;
+      if (!b.lastLaunchedAt) return -1;
+      return new Date(b.lastLaunchedAt).getTime() - new Date(a.lastLaunchedAt).getTime();
+    });
+
+    const target = sorted[0];
+    if (target) {
+      await handleLaunch(target.id);
+    }
+  }, [workspaces]);
+
+  // In-app keyboard shortcuts: Ctrl+Space / Ctrl+K (Quick Switcher), Ctrl+Shift+C (Capture), Ctrl+Shift+L (Launch Last), Ctrl+N (New), Ctrl+, (Settings)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
@@ -107,15 +126,21 @@ export const App: React.FC = () => {
       } else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'c' && !isInput) {
         e.preventDefault();
         handleCaptureCurrent();
+      } else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'l' && !isInput) {
+        e.preventDefault();
+        handleLaunchLast();
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n' && !isInput) {
         e.preventDefault();
         handleOpenCreate();
+      } else if ((e.ctrlKey || e.metaKey) && e.key === ',' && !isInput) {
+        e.preventDefault();
+        handleSelectTab('settings');
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [handleLaunchLast]);
 
   // Theme application
   useEffect(() => {
@@ -211,35 +236,9 @@ export const App: React.FC = () => {
 
   return (
     <div className={styles.appLayout}>
-      {/* Liquid Ambient Mesh Backdrop blending with Windows Active Theme */}
-      <div className={styles.liquidMeshContainer} aria-hidden="true">
-        <div className={styles.liquidOrb1} />
-        <div className={styles.liquidOrb2} />
-        <div className={styles.liquidOrb3} />
-      </div>
-
       <Sidebar currentTab={currentTab} onSelectTab={handleSelectTab} />
 
       <main className={styles.mainContent}>
-        {/* Custom Window Titlebar row */}
-        <div className={styles.windowTitleBar}>
-          <div className={styles.titleBarLeft}>
-            <button
-              className={styles.quickLauncherTriggerBtn}
-              onClick={() => setIsQuickSwitcherOpen(true)}
-              title="Open Quick Launcher (Ctrl + Space)"
-            >
-              <span>Quick Launcher</span>
-              <span className={styles.quickLauncherKbd}>Ctrl + Space</span>
-            </button>
-          </div>
-          <div className={styles.windowControls}>
-            <span className={styles.controlBtn} title="Minimize">&#x2014;</span>
-            <span className={styles.controlBtn} title="Maximize">&#x25A1;</span>
-            <span className={`${styles.controlBtn} ${styles.controlClose}`} title="Close">&#x2715;</span>
-          </div>
-        </div>
-
         {isLoading ? (
           <div className={styles.loadingContainer}>
             <div className={styles.spinner} />
@@ -260,6 +259,7 @@ export const App: React.FC = () => {
                 workspaces={workspaces}
                 onOpenCreate={handleOpenCreate}
                 onLaunch={handleLaunch}
+                onLaunchLast={handleLaunchLast}
                 onEdit={handleOpenEdit}
                 onDuplicate={handleDuplicate}
                 onDelete={setWorkspaceToDelete}
@@ -283,16 +283,12 @@ export const App: React.FC = () => {
               />
             )}
 
-            {currentTab === 'notes' && (
-              <QuickNotesView workspaces={workspaces} />
+            {currentTab === 'activity' && (
+              <ActivityView />
             )}
 
             {currentTab === 'settings' && (
               <SettingsView currentTheme={theme} onThemeChange={setTheme} />
-            )}
-
-            {currentTab === 'about' && (
-              <AboutView />
             )}
           </>
         )}
@@ -323,14 +319,22 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* Quick Switcher / Quick Launcher Overlay */}
+      {/* Quick Switcher Floating Overlay (Section 6.6) */}
       <QuickSwitcher
         isOpen={isQuickSwitcherOpen}
         onClose={() => setIsQuickSwitcherOpen(false)}
         workspaces={workspaces}
         onLaunch={handleLaunch}
-        onOpenNotes={() => handleSelectTab('notes')}
-        onOpenSettings={() => handleSelectTab('settings')}
+        onOpenNotes={() => {
+          setSelectedWorkspaceId(null);
+          setCurrentTab('workspaces');
+          setIsQuickSwitcherOpen(false);
+        }}
+        onOpenSettings={() => {
+          setSelectedWorkspaceId(null);
+          setCurrentTab('settings');
+          setIsQuickSwitcherOpen(false);
+        }}
         onCaptureCurrent={handleCaptureCurrent}
       />
     </div>

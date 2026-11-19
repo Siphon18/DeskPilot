@@ -55,6 +55,7 @@ export interface WorkspaceDTO {
   createdAt: string;
   updatedAt: string;
   lastLaunchedAt: string | null;
+  items?: LaunchItemDTO[];
 }
 
 export interface WorkspaceTaskDTO {

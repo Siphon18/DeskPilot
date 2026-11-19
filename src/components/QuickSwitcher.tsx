@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Search, Play, FileText, Settings, Camera, Code2, GraduationCap, Briefcase, Layers } from 'lucide-react';
+import { Search, Star, Layers, Code2, GraduationCap, Briefcase, Play, Settings, FileText, Camera } from 'lucide-react';
 import type { WorkspaceDTO } from '../lib/types';
 import styles from './QuickSwitcher.module.css';
 
@@ -30,19 +30,22 @@ export const QuickSwitcher: React.FC<QuickSwitcherProps> = ({
     if (isOpen) {
       setQuery('');
       setSelectedIndex(0);
-      setTimeout(() => inputRef.current?.focus(), 50);
+      setTimeout(() => inputRef.current?.focus(), 40);
     }
   }, [isOpen]);
 
+  // Filter & group workspaces: when query is empty, prioritize Favorites then Recently Launched
   const filtered = useMemo(() => {
     let list = [...workspaces];
     if (query.trim()) {
       const q = query.toLowerCase();
       list = list.filter(
-        (w) => w.name.toLowerCase().includes(q) || w.description.toLowerCase().includes(q)
+        (w) =>
+          w.name.toLowerCase().includes(q) ||
+          w.description.toLowerCase().includes(q) ||
+          (w.items && w.items.some((i) => i.name.toLowerCase().includes(q)))
       );
     } else {
-      // Favorites first, then most recently launched
       list.sort((a, b) => {
         if (a.isFavorite && !b.isFavorite) return -1;
         if (!a.isFavorite && b.isFavorite) return 1;
@@ -80,36 +83,33 @@ export const QuickSwitcher: React.FC<QuickSwitcherProps> = ({
     }
   };
 
-  const getWorkspaceIcon = (name: string, iconKey: string) => {
-    const lower = name.toLowerCase();
-    if (lower.includes('dev') || lower.includes('code') || iconKey === 'terminal' || iconKey === 'code') {
-      return <Code2 size={18} />;
+  const getWorkspaceCategory = (ws: WorkspaceDTO) => {
+    const lower = ws.name.toLowerCase();
+    if (lower.includes('dev') || lower.includes('code') || ws.icon === 'code' || ws.icon === 'terminal') {
+      return { icon: <Code2 size={16} strokeWidth={2} />, typeClass: styles.iconDev };
     }
-    if (lower.includes('study') || lower.includes('learn') || iconKey === 'book' || iconKey === 'book-open') {
-      return <GraduationCap size={18} />;
+    if (lower.includes('study') || lower.includes('learn') || ws.icon === 'book' || ws.icon === 'graduation-cap') {
+      return { icon: <GraduationCap size={16} strokeWidth={2} />, typeClass: styles.iconStudy };
     }
-    if (lower.includes('job') || lower.includes('work') || lower.includes('career') || iconKey === 'briefcase') {
-      return <Briefcase size={18} />;
+    if (lower.includes('job') || lower.includes('work') || ws.icon === 'briefcase') {
+      return { icon: <Briefcase size={16} strokeWidth={2} />, typeClass: styles.iconWork };
     }
-    return <Layers size={18} />;
+    return { icon: <Layers size={16} strokeWidth={2} />, typeClass: styles.iconDefault };
   };
 
-  const getAccentColor = (ws: WorkspaceDTO, idx: number) => {
-    if (ws.color === 'blue' || ws.color === '#3b82f6') return '#38bdf8';
-    if (ws.color === 'purple' || ws.color === '#8b5cf6') return '#c084fc';
-    if (ws.color === 'green' || ws.color === '#10b981') return '#34d399';
-    if (ws.color === 'orange' || ws.color === '#f97316') return '#fb923c';
-    if (ws.color === 'pink' || ws.color === '#ec4899') return '#f472b6';
-    const fallbackPalette = ['#38bdf8', '#c084fc', '#34d399', '#fb923c'];
-    return fallbackPalette[idx % fallbackPalette.length];
+  const getItemSubtitle = (ws: WorkspaceDTO) => {
+    if (ws.items && ws.items.length > 0) {
+      return ws.items.map((i) => i.name).filter(Boolean).slice(0, 3).join(' · ');
+    }
+    return ws.description || `${ws.itemCount} ${ws.itemCount === 1 ? 'item' : 'items'}`;
   };
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={styles.overlay} onClick={onClose} role="dialog" aria-modal="true">
       <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
-        {/* Search header with Ctrl + Space badge */}
+        {/* Search header (Section 6.6: prominent search field with immediate focus) */}
         <div className={styles.searchHeader}>
-          <Search size={18} className={styles.searchIcon} />
+          <Search size={16} className={styles.searchIcon} />
           <input
             ref={inputRef}
             type="text"
@@ -122,64 +122,62 @@ export const QuickSwitcher: React.FC<QuickSwitcherProps> = ({
           <span className={styles.shortcutBadge}>Ctrl + Space</span>
         </div>
 
-        {/* Workspace cards list */}
+        {/* Workspace result rows */}
         <div className={styles.resultsList}>
           {filtered.length === 0 ? (
-            <div className={styles.emptyState}>No workspaces found</div>
+            <div className={styles.emptyState}>No workspaces match "{query}"</div>
           ) : (
             filtered.map((ws, idx) => {
               const isSelected = idx === selectedIndex;
-              const accentColor = getAccentColor(ws, idx);
+              const { icon, typeClass } = getWorkspaceCategory(ws);
+              const subtitle = getItemSubtitle(ws);
 
               return (
                 <div
                   key={ws.id}
-                  className={`${styles.workspaceCard} ${isSelected ? styles.workspaceCardActive : ''}`}
+                  className={`${styles.resultRow} ${isSelected ? styles.resultRowActive : ''}`}
                   onClick={() => {
                     onLaunch(ws.id);
                     onClose();
                   }}
                   onMouseEnter={() => setSelectedIndex(idx)}
                 >
-                  <div
-                    className={styles.iconBox}
-                    style={{
-                      backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.2)' : `${accentColor}20`,
-                      color: isSelected ? '#ffffff' : accentColor,
-                    }}
-                  >
-                    {getWorkspaceIcon(ws.name, ws.icon)}
+                  <div className={`${styles.iconBox} ${typeClass}`}>
+                    {icon}
                   </div>
 
-                  <div className={styles.cardInfo}>
-                    <span className={styles.cardTitle}>{ws.name}</span>
-                    <span className={styles.cardSubtitle}>
-                      {ws.description || (ws.itemCount > 0 ? `${ws.itemCount} configured apps` : 'Ready to launch')}
-                    </span>
+                  <div className={styles.itemInfo}>
+                    <div className={styles.titleLine}>
+                      <span className={styles.itemName}>{ws.name}</span>
+                      {ws.isFavorite && (
+                        <Star size={11} fill="#f59e0b" color="#f59e0b" />
+                      )}
+                    </div>
+                    <span className={styles.itemDesc}>{subtitle}</span>
                   </div>
 
-                  <button
-                    className={`${styles.playButton} ${isSelected ? styles.playButtonActive : ''}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onLaunch(ws.id);
-                      onClose();
-                    }}
-                    title="Launch workspace in 1 click"
-                    aria-label={`Launch ${ws.name}`}
-                  >
-                    <Play size={14} fill="currentColor" />
-                  </button>
+                  <div className={styles.itemRight}>
+                    <button
+                      className={`${styles.playBtn} ${isSelected ? styles.playBtnActive : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onLaunch(ws.id);
+                        onClose();
+                      }}
+                      title={`Launch ${ws.name}`}
+                      aria-label={`Launch ${ws.name}`}
+                    >
+                      <Play size={12} fill="currentColor" strokeWidth={0} />
+                    </button>
+                  </div>
                 </div>
               );
             })
           )}
         </div>
 
-        <div className={styles.divider} />
-
-        {/* Quick Actions row */}
-        <div className={styles.quickActions}>
+        {/* Quick Utility Actions Divider & Rows (Mockup Reference) */}
+        <div className={styles.quickActionsSection}>
           {onCaptureCurrent && (
             <button
               className={styles.actionRow}
@@ -188,50 +186,48 @@ export const QuickSwitcher: React.FC<QuickSwitcherProps> = ({
                 onClose();
               }}
             >
-              <div className={styles.actionLeft}>
-                <Camera size={16} className={styles.actionIcon} />
-                <span>1-Click Capture Desktop</span>
-              </div>
+              <Camera size={14} className={styles.actionIcon} />
+              <span className={styles.actionLabel}>Capture Current Desktop</span>
               <span className={styles.actionBadge}>Ctrl + Shift + C</span>
             </button>
           )}
 
-          <button
-            className={styles.actionRow}
-            onClick={() => {
-              onOpenNotes?.();
-              onClose();
-            }}
-          >
-            <div className={styles.actionLeft}>
-              <FileText size={16} className={styles.actionIcon} />
-              <span>Open Quick Notes</span>
-            </div>
-            <span className={styles.actionBadge}>Ctrl + N</span>
-          </button>
+          {onOpenNotes && (
+            <button
+              className={styles.actionRow}
+              onClick={() => {
+                onOpenNotes();
+                onClose();
+              }}
+            >
+              <FileText size={14} className={styles.actionIcon} />
+              <span className={styles.actionLabel}>Open Quick Notes</span>
+              <span className={styles.actionBadge}>Ctrl + N</span>
+            </button>
+          )}
 
-          <button
-            className={styles.actionRow}
-            onClick={() => {
-              onOpenSettings?.();
-              onClose();
-            }}
-          >
-            <div className={styles.actionLeft}>
-              <Settings size={16} className={styles.actionIcon} />
-              <span>Open Settings</span>
-            </div>
-            <span className={styles.actionBadge}>Ctrl + ,</span>
-          </button>
+          {onOpenSettings && (
+            <button
+              className={styles.actionRow}
+              onClick={() => {
+                onOpenSettings();
+                onClose();
+              }}
+            >
+              <Settings size={14} className={styles.actionIcon} />
+              <span className={styles.actionLabel}>Open Settings</span>
+              <span className={styles.actionBadge}>Ctrl + ,</span>
+            </button>
+          )}
         </div>
 
-        {/* Footer */}
+        {/* Footer shortcuts hint (Section 6.6) */}
         <div className={styles.footer}>
-          <div className={styles.footerBrand}>
-            <span className={styles.footerDot} />
-            <span className={styles.footerBrandText}>DeskPilot</span>
+          <div className={styles.brandTag}>
+            <span className={styles.brandDot} />
+            <span>DeskPilot</span>
           </div>
-          <span className={styles.footerDismiss}>Press Esc to close</span>
+          <span className={styles.closeHint}>Press Esc to close</span>
         </div>
       </div>
     </div>
