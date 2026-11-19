@@ -188,8 +188,7 @@ export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({
           title={`Launch ${workspace.name}`}
           aria-label={`Launch ${workspace.name}`}
         >
-          <Play size={12} fill="currentColor" strokeWidth={0} />
-          <span>Launch</span>
+          <Play size={13} fill="currentColor" strokeWidth={0} style={{ marginLeft: '1px' }} />
         </button>
       </div>
     </div>

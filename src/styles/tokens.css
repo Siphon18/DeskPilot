@@ -48,16 +48,16 @@
 /* Dark Fluent Acrylic Glass Theme */
 :root, [data-theme="dark"] {
   /* True translucent acrylic glass surfaces: allowing native DWM blur to shine through */
-  --bg-window: rgba(18, 22, 30, 0.58);
-  --bg-sidebar: rgba(14, 18, 25, 0.45);
+  --bg-window: rgba(14, 18, 26, 0.38);
+  --bg-sidebar: rgba(12, 16, 22, 0.30);
   --bg-app: transparent;
-  --bg-card: rgba(26, 33, 46, 0.55);
-  --bg-card-hover: rgba(34, 43, 62, 0.72);
-  --bg-card-active: rgba(42, 53, 76, 0.85);
+  --bg-card: rgba(22, 28, 40, 0.40);
+  --bg-card-hover: rgba(30, 40, 58, 0.58);
+  --bg-card-active: rgba(38, 50, 72, 0.72);
   --bg-subtle: rgba(255, 255, 255, 0.05);
   --bg-subtle-hover: rgba(255, 255, 255, 0.09);
-  --bg-input: rgba(14, 18, 26, 0.75);
-  --bg-modal: rgba(20, 26, 38, 0.88);
+  --bg-input: rgba(12, 16, 24, 0.60);
+  --bg-modal: rgba(18, 24, 34, 0.72);
   --bg-keycap: rgba(255, 255, 255, 0.07);
 
   --text-primary: #f3f5f8;

@@ -57,9 +57,9 @@ pub fn run() {
                             }
                         }
 
-                        // Apply Windows 11 Acrylic blur behind with blur fallback
-                        if apply_acrylic(&window, Some((16, 22, 32, 120))).is_err() {
-                            let _ = apply_blur(&window, Some((16, 22, 32, 120)));
+                        // Apply Windows 11 Acrylic blur behind with higher transparency (23% tint alpha) and blur fallback
+                        if apply_acrylic(&window, Some((12, 16, 24, 60))).is_err() {
+                            let _ = apply_blur(&window, Some((12, 16, 24, 60)));
                         }
                     }
                 }
@@ -126,44 +126,65 @@ pub fn run() {
 
             let _ = tray_builder.build(app)?;
 
-            // Register default global shortcut Ctrl+Space (or Ctrl+Alt+Space fallback)
-            let shortcut_res = "ctrl+space".parse::<Shortcut>();
-            let shortcut = match shortcut_res {
-                Ok(s) => s,
-                Err(_) => "ctrl+alt+space".parse::<Shortcut>().expect("Valid shortcut format"),
-            };
+            // Register Global Shortcuts that work everywhere, even when windows are closed or app is in background
+            let handle = app.handle().clone();
 
-            let _ = app.global_shortcut().on_shortcut(shortcut, |app, _shortcut, event| {
-                if event.state == ShortcutState::Pressed {
-                    if let Some(launcher) = app.get_webview_window("launcher") {
-                        if launcher.is_visible().unwrap_or(false) {
-                            let _ = launcher.hide();
-                        } else {
+            // 1. Quick Launcher Hotkeys: Ctrl+Space AND Alt+Space
+            for sc_str in &["ctrl+space", "alt+space", "ctrl+alt+space"] {
+                if let Ok(shortcut) = sc_str.parse::<Shortcut>() {
+                    let h = handle.clone();
+                    let sc_name = *sc_str;
+                    let res = app.global_shortcut().on_shortcut(shortcut, move |_app, _sc, event| {
+                        if event.state == ShortcutState::Pressed {
+                            if let Some(launcher) = h.get_webview_window("launcher") {
+                                if launcher.is_visible().unwrap_or(false) {
+                                    let _ = launcher.hide();
+                                } else {
+                                    let _ = launcher.show();
+                                    let _ = launcher.unminimize();
+                                    let _ = launcher.set_focus();
+                                    let _ = launcher.emit("quick-launcher:focus", ());
+                                }
+                            }
+                        }
+                    });
+                    log::info!("Registered global shortcut {}: {:?}", sc_name, res);
+                }
+            }
+
+            // 2. Capture Desktop: Ctrl+Shift+C
+            if let Ok(shortcut) = "ctrl+shift+c".parse::<Shortcut>() {
+                let h = handle.clone();
+                let res = app.global_shortcut().on_shortcut(shortcut, move |_app, _sc, event| {
+                    if event.state == ShortcutState::Pressed {
+                        if let Some(launcher) = h.get_webview_window("launcher") {
                             let _ = launcher.show();
                             let _ = launcher.unminimize();
                             let _ = launcher.set_focus();
-                            let _ = launcher.emit("quick-launcher:focus", ());
+                            let _ = launcher.emit("workspace:capture-desktop", ());
                         }
-                    }
-                }
-            });
-
-            // Also register ctrl+alt+space just in case
-            if let Ok(alt_shortcut) = "ctrl+alt+space".parse::<Shortcut>() {
-                let _ = app.global_shortcut().on_shortcut(alt_shortcut, |app, _shortcut, event| {
-                    if event.state == ShortcutState::Pressed {
-                        if let Some(launcher) = app.get_webview_window("launcher") {
-                            if launcher.is_visible().unwrap_or(false) {
-                                let _ = launcher.hide();
-                            } else {
-                                let _ = launcher.show();
-                                let _ = launcher.unminimize();
-                                let _ = launcher.set_focus();
-                                let _ = launcher.emit("quick-launcher:focus", ());
-                            }
+                        if let Some(main) = h.get_webview_window("main") {
+                            let _ = main.emit("workspace:capture-desktop", ());
                         }
                     }
                 });
+                log::info!("Registered global shortcut ctrl+shift+c: {:?}", res);
+            }
+
+            // 3. Launch Last Workspace: Ctrl+Shift+L
+            if let Ok(shortcut) = "ctrl+shift+l".parse::<Shortcut>() {
+                let h = handle.clone();
+                let res = app.global_shortcut().on_shortcut(shortcut, move |_app, _sc, event| {
+                    if event.state == ShortcutState::Pressed {
+                        if let Some(main) = h.get_webview_window("main") {
+                            let _ = main.emit("workspace:launch-last", ());
+                        }
+                        if let Some(launcher) = h.get_webview_window("launcher") {
+                            let _ = launcher.emit("workspace:launch-last", ());
+                        }
+                    }
+                });
+                log::info!("Registered global shortcut ctrl+shift+l: {:?}", res);
             }
 
             app.manage(db);

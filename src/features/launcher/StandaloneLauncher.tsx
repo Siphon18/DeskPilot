@@ -15,6 +15,7 @@ import {
 import type { WorkspaceDTO } from '../../lib/types';
 import { desktopApi } from '../../lib/desktop-api';
 import { useToast } from '../../components/Toast';
+import { listen } from '@tauri-apps/api/event';
 import styles from './StandaloneLauncher.module.css';
 
 export const StandaloneLauncher: React.FC = () => {
@@ -51,6 +52,30 @@ export const StandaloneLauncher: React.FC = () => {
         );
       })
       .catch(() => {});
+
+    // Listen to focus / activation events from background shortcut triggers
+    let unlistenFocus: (() => void) | null = null;
+    let unlistenCapture: (() => void) | null = null;
+
+    listen('quick-launcher:focus', () => {
+      loadWorkspaces();
+      setQuery('');
+      setSelectedIndex(0);
+      setTimeout(() => inputRef.current?.focus(), 30);
+    }).then((fn) => {
+      unlistenFocus = fn;
+    });
+
+    listen('workspace:capture-desktop', () => {
+      handleCaptureDesktop();
+    }).then((fn) => {
+      unlistenCapture = fn;
+    });
+
+    return () => {
+      if (unlistenFocus) unlistenFocus();
+      if (unlistenCapture) unlistenCapture();
+    };
   }, []);
 
   const filtered = useMemo(() => {

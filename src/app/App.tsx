@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { WorkspaceDTO, CreateWorkspaceInput, UpdateWorkspaceInput } from '../lib/types';
 import { desktopApi, onQuickSwitcherShow, onDashboardShow, onCaptureDesktopEvent } from '../lib/desktop-api';
+import { listen } from '@tauri-apps/api/event';
 import { Sidebar, type NavTab } from '../components/Sidebar';
 import { OverviewView } from '../features/overview/OverviewView';
 import { WorkspacesView } from '../features/workspaces/WorkspacesView';
@@ -74,6 +75,7 @@ export const App: React.FC = () => {
     let unlistenShortcut: (() => void) | null = null;
     let unlistenDashboard: (() => void) | null = null;
     let unlistenCapture: (() => void) | null = null;
+    let unlistenLaunchLast: (() => void) | null = null;
 
     onQuickSwitcherShow(() => {
       setIsQuickSwitcherOpen(true);
@@ -93,12 +95,35 @@ export const App: React.FC = () => {
       unlistenCapture = fn;
     });
 
+    listen('workspace:launch-last', async () => {
+      try {
+        const list = await desktopApi.workspaces.list();
+        if (list && list.length > 0) {
+          const sorted = [...list].sort((a, b) => {
+            if (!a.lastLaunchedAt && !b.lastLaunchedAt) return 0;
+            if (!a.lastLaunchedAt) return 1;
+            if (!b.lastLaunchedAt) return -1;
+            return new Date(b.lastLaunchedAt).getTime() - new Date(a.lastLaunchedAt).getTime();
+          });
+          if (sorted[0]) {
+            await desktopApi.launch.start(sorted[0].id);
+            showToast(`Launched "${sorted[0].name}"`, 'success');
+          }
+        }
+      } catch (err: any) {
+        showToast(err.message || 'Failed to launch last workspace', 'error');
+      }
+    }).then((fn) => {
+      unlistenLaunchLast = fn;
+    });
+
     return () => {
       if (unlistenShortcut) unlistenShortcut();
       if (unlistenDashboard) unlistenDashboard();
       if (unlistenCapture) unlistenCapture();
+      if (unlistenLaunchLast) unlistenLaunchLast();
     };
-  }, []);
+  }, [showToast]);
 
   // Workspace 1-Click Desktop Capture Handler
   const handleCaptureCurrent = async () => {

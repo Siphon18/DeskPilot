@@ -186,8 +186,8 @@
 
 /* Play Round Button (matches circular button in mockup) */
 .launchBtn {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background-color: var(--accent-primary);
   color: #ffffff;
