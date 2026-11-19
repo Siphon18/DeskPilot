@@ -2,6 +2,9 @@
   <img src="src-tauri/icons/128x128@2x.png" width="128" height="128" alt="DeskPilot Logo" style="border-radius: 28px;" />
   <h1>DeskPilot</h1>
   <p><strong>Lightweight local-first Windows 11 workspace launcher with native Acrylic blur and one-click desktop capture.</strong></p>
+  <p>
+    <a href="https://github.com/Siphon18/DeskPilot/releases/latest"><img src="https://img.shields.io/github/v/release/Siphon18/DeskPilot?color=7c3aed&label=Download%20Installer&logo=windows&logoColor=white&style=for-the-badge" alt="Download DeskPilot" /></a>
+  </p>
 </div>
 
 ---
