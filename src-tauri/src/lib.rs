@@ -120,7 +120,16 @@ pub fn run() {
                     }
                 });
 
-            if let Some(icon) = app.default_window_icon() {
+            let app_icon_bytes = include_bytes!("../icons/128x128.png");
+            if let Ok(icon) = tauri::image::Image::from_bytes(app_icon_bytes) {
+                if let Some(main) = app.get_webview_window("main") {
+                    let _ = main.set_icon(icon.clone());
+                }
+                if let Some(launcher) = app.get_webview_window("launcher") {
+                    let _ = launcher.set_icon(icon.clone());
+                }
+                tray_builder = tray_builder.icon(icon);
+            } else if let Some(icon) = app.default_window_icon() {
                 tray_builder = tray_builder.icon(icon.clone());
             }
 
