@@ -85,11 +85,72 @@ pub fn workspace_get_open_apps() -> Result<Vec<CapturedWindowApp>, CommandError>
     Ok(window_capture::capture_open_application_windows())
 }
 
+static IS_CAPTURING: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static LAST_CAPTURE_TIME: std::sync::atomic::AtomicI64 = std::sync::atomic::AtomicI64::new(0);
+
 #[tauri::command]
 pub fn workspace_capture_current(
     state: State<'_, DbState>,
     name: Option<String>,
 ) -> Result<WorkspaceDetailDTO, CommandError> {
+    let now = chrono::Utc::now().timestamp_millis();
+    let last = LAST_CAPTURE_TIME.load(std::sync::atomic::Ordering::SeqCst);
+    if now - last < 2000 {
+        // Return latest workspace if captured within last 2 seconds
+        let conn = state.conn.lock().map_err(|_| CommandError {
+            code: "DATABASE_LOCK_ERROR".into(),
+            message: "Failed to acquire database lock".into(),
+        })?;
+        if let Ok(list) = workspace_repo::list_workspaces(&conn, None) {
+            if let Some(first) = list.into_iter().next() {
+                if let Ok(detail) = workspace_repo::get_workspace(&conn, &first.id) {
+                    if let Some(ws) = detail {
+                        return Ok(ws);
+                    }
+                }
+            }
+        }
+    }
+
+    if IS_CAPTURING
+        .compare_exchange(
+            false,
+            true,
+            std::sync::atomic::Ordering::SeqCst,
+            std::sync::atomic::Ordering::SeqCst,
+        )
+        .is_err()
+    {
+        // Another capture is currently in-flight; wait up to 500ms and return the newly captured workspace
+        std::thread::sleep(std::time::Duration::from_millis(500));
+        let conn = state.conn.lock().map_err(|_| CommandError {
+            code: "DATABASE_LOCK_ERROR".into(),
+            message: "Failed to acquire database lock".into(),
+        })?;
+        if let Ok(list) = workspace_repo::list_workspaces(&conn, None) {
+            if let Some(first) = list.into_iter().next() {
+                if let Ok(detail) = workspace_repo::get_workspace(&conn, &first.id) {
+                    if let Some(ws) = detail {
+                        return Ok(ws);
+                    }
+                }
+            }
+        }
+        return Err(CommandError {
+            code: "CAPTURE_BUSY".into(),
+            message: "Workspace capture is already in progress".into(),
+        });
+    }
+
+    struct CaptureGuard;
+    impl Drop for CaptureGuard {
+        fn drop(&mut self) {
+            IS_CAPTURING.store(false, std::sync::atomic::Ordering::SeqCst);
+            LAST_CAPTURE_TIME.store(chrono::Utc::now().timestamp_millis(), std::sync::atomic::Ordering::SeqCst);
+        }
+    }
+    let _guard = CaptureGuard;
+
     let apps = window_capture::capture_open_application_windows();
 
     let workspace_name = match name {

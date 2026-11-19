@@ -23,6 +23,7 @@ export const StandaloneLauncher: React.FC = () => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isCapturingRef = useRef(false);
   const { showToast } = useToast();
 
   const loadWorkspaces = async () => {
@@ -33,6 +34,25 @@ export const StandaloneLauncher: React.FC = () => {
       // fallback
     }
   };
+
+  const handleCaptureDesktop = async () => {
+    if (isCapturingRef.current) return;
+    isCapturingRef.current = true;
+    try {
+      const created = await desktopApi.workspaces.captureCurrent();
+      showToast(`Captured "${created.name}" with ${created.items.length} apps`, 'success');
+      await loadWorkspaces();
+    } catch (err: any) {
+      showToast(err.message || 'Failed to capture desktop', 'error');
+    } finally {
+      setTimeout(() => {
+        isCapturingRef.current = false;
+      }, 1000);
+    }
+  };
+
+  const handleCaptureRef = useRef(handleCaptureDesktop);
+  handleCaptureRef.current = handleCaptureDesktop;
 
   useEffect(() => {
     loadWorkspaces();
@@ -67,7 +87,7 @@ export const StandaloneLauncher: React.FC = () => {
     });
 
     listen('workspace:capture-desktop', () => {
-      handleCaptureDesktop();
+      handleCaptureRef.current();
     }).then((fn) => {
       unlistenCapture = fn;
     });
@@ -118,15 +138,6 @@ export const StandaloneLauncher: React.FC = () => {
     }
   };
 
-  const handleCaptureDesktop = async () => {
-    try {
-      const created = await desktopApi.workspaces.captureCurrent();
-      showToast(`Captured "${created.name}" with ${created.items.length} apps`, 'success');
-      await loadWorkspaces();
-    } catch (err: any) {
-      showToast(err.message || 'Failed to capture desktop', 'error');
-    }
-  };
 
   const handleOpenSettings = async () => {
     try {

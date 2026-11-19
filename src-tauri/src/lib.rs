@@ -152,18 +152,24 @@ pub fn run() {
                 }
             }
 
-            // 2. Capture Desktop: Ctrl+Shift+C
+            // 2. Capture Desktop: Ctrl+Shift+C (debounced to avoid multiple rapid executions)
             if let Ok(shortcut) = "ctrl+shift+c".parse::<Shortcut>() {
                 let h = handle.clone();
+                static LAST_SC_CAPTURE: std::sync::atomic::AtomicI64 = std::sync::atomic::AtomicI64::new(0);
                 let res = app.global_shortcut().on_shortcut(shortcut, move |_app, _sc, event| {
                     if event.state == ShortcutState::Pressed {
+                        let now = chrono::Utc::now().timestamp_millis();
+                        let prev = LAST_SC_CAPTURE.swap(now, std::sync::atomic::Ordering::SeqCst);
+                        if now - prev < 1500 {
+                            return;
+                        }
+
                         if let Some(launcher) = h.get_webview_window("launcher") {
                             let _ = launcher.show();
                             let _ = launcher.unminimize();
                             let _ = launcher.set_focus();
                             let _ = launcher.emit("workspace:capture-desktop", ());
-                        }
-                        if let Some(main) = h.get_webview_window("main") {
+                        } else if let Some(main) = h.get_webview_window("main") {
                             let _ = main.emit("workspace:capture-desktop", ());
                         }
                     }
@@ -171,15 +177,21 @@ pub fn run() {
                 log::info!("Registered global shortcut ctrl+shift+c: {:?}", res);
             }
 
-            // 3. Launch Last Workspace: Ctrl+Shift+L
+            // 3. Launch Last Workspace: Ctrl+Shift+L (debounced)
             if let Ok(shortcut) = "ctrl+shift+l".parse::<Shortcut>() {
                 let h = handle.clone();
+                static LAST_SC_LAUNCH: std::sync::atomic::AtomicI64 = std::sync::atomic::AtomicI64::new(0);
                 let res = app.global_shortcut().on_shortcut(shortcut, move |_app, _sc, event| {
                     if event.state == ShortcutState::Pressed {
+                        let now = chrono::Utc::now().timestamp_millis();
+                        let prev = LAST_SC_LAUNCH.swap(now, std::sync::atomic::Ordering::SeqCst);
+                        if now - prev < 1500 {
+                            return;
+                        }
+
                         if let Some(main) = h.get_webview_window("main") {
                             let _ = main.emit("workspace:launch-last", ());
-                        }
-                        if let Some(launcher) = h.get_webview_window("launcher") {
+                        } else if let Some(launcher) = h.get_webview_window("launcher") {
                             let _ = launcher.emit("workspace:launch-last", ());
                         }
                     }

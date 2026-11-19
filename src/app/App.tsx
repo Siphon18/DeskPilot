@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import type { WorkspaceDTO, CreateWorkspaceInput, UpdateWorkspaceInput } from '../lib/types';
 import { desktopApi, onQuickSwitcherShow, onDashboardShow, onCaptureDesktopEvent } from '../lib/desktop-api';
 import { listen } from '@tauri-apps/api/event';
@@ -38,6 +38,7 @@ export const App: React.FC = () => {
   // Theme state: Default to system per Section 6.4
   const [theme, setTheme] = useState<'system' | 'light' | 'dark'>('system');
   const { showToast } = useToast();
+  const isCapturingRef = useRef(false);
 
   // Load workspaces from Rust SQLite
   const loadWorkspaces = useCallback(async () => {
@@ -50,6 +51,26 @@ export const App: React.FC = () => {
       setIsLoading(false);
     }
   }, [showToast]);
+
+  // Workspace 1-Click Desktop Capture Handler with lock
+  const handleCaptureCurrent = useCallback(async () => {
+    if (isCapturingRef.current) return;
+    isCapturingRef.current = true;
+    try {
+      const created = await desktopApi.workspaces.captureCurrent();
+      showToast(`Captured workspace "${created.name}" with ${created.items.length} apps`, 'success');
+      await loadWorkspaces();
+    } catch (err: any) {
+      showToast(err.message || 'Failed to capture desktop workspace', 'error');
+    } finally {
+      setTimeout(() => {
+        isCapturingRef.current = false;
+      }, 1000);
+    }
+  }, [loadWorkspaces, showToast]);
+
+  const handleCaptureRef = useRef(handleCaptureCurrent);
+  handleCaptureRef.current = handleCaptureCurrent;
 
   useEffect(() => {
     loadWorkspaces();
@@ -90,7 +111,7 @@ export const App: React.FC = () => {
     });
 
     onCaptureDesktopEvent(() => {
-      handleCaptureCurrent();
+      handleCaptureRef.current();
     }).then((fn) => {
       unlistenCapture = fn;
     });
@@ -124,17 +145,6 @@ export const App: React.FC = () => {
       if (unlistenLaunchLast) unlistenLaunchLast();
     };
   }, [showToast]);
-
-  // Workspace 1-Click Desktop Capture Handler
-  const handleCaptureCurrent = async () => {
-    try {
-      const created = await desktopApi.workspaces.captureCurrent();
-      showToast(`Captured workspace "${created.name}" with ${created.items.length} apps`, 'success');
-      await loadWorkspaces();
-    } catch (err: any) {
-      showToast(err.message || 'Failed to capture desktop workspace', 'error');
-    }
-  };
 
   // Launch the most recently launched workspace (Ctrl + Shift + L)
   const handleLaunchLast = useCallback(async () => {
