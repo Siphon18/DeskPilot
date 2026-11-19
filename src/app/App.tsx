@@ -7,6 +7,7 @@ import { WorkspacesView } from '../features/workspaces/WorkspacesView';
 import { WorkspaceDetailView } from '../features/workspaces/WorkspaceDetailView';
 import { ActivityView } from '../features/activity/ActivityView';
 import { SettingsView } from '../features/settings/SettingsView';
+import { WindowHeader } from '../components/WindowHeader';
 import { WorkspaceModal } from '../components/WorkspaceModal';
 import { DeleteModal } from '../components/DeleteModal';
 import { LaunchModal } from '../components/LaunchModal';
@@ -264,10 +265,12 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className={styles.appLayout}>
-      <Sidebar currentTab={currentTab} onSelectTab={handleSelectTab} />
+    <div className={styles.appShell}>
+      <WindowHeader title="DeskPilot Settings & Workspaces" showBrand={true} />
+      <div className={styles.appLayout}>
+        <Sidebar currentTab={currentTab} onSelectTab={handleSelectTab} />
 
-      <main className={styles.mainContent}>
+        <main className={styles.mainContent}>
         {isLoading ? (
           <div className={styles.loadingContainer}>
             <div className={styles.spinner} />
@@ -369,6 +372,7 @@ export const App: React.FC = () => {
         }}
         onCaptureCurrent={handleCaptureCurrent}
       />
+      </div>
     </div>
   );
 };

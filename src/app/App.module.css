@@ -1,5 +1,6 @@
-.appLayout {
+.appShell {
   display: flex;
+  flex-direction: column;
   height: 100vh;
   width: 100vw;
   overflow: hidden;
@@ -9,6 +10,17 @@
     var(--bg-app);
   backdrop-filter: var(--liquid-blur);
   -webkit-backdrop-filter: var(--liquid-blur);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-dialog);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+}
+
+.appLayout {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .mainContent {

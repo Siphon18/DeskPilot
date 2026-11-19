@@ -151,9 +151,9 @@ export const StandaloneLauncher: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.card}>
+      <div className={styles.card} data-tauri-drag-region>
         {/* Search header with instant focus */}
-        <div className={styles.searchHeader}>
+        <div className={styles.searchHeader} data-tauri-drag-region>
           <Search size={16} className={styles.searchIcon} />
           <input
             ref={inputRef}

@@ -193,6 +193,8 @@ pub fn run() {
             commands::settings::settings_get_windows_theme_color,
             commands::window::window_hide,
             commands::window::window_show,
+            commands::window::window_minimize,
+            commands::window::window_toggle_maximize,
             commands::window::open_main_dashboard,
             commands::window::close_launcher,
         ])
