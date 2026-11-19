@@ -1,5 +1,5 @@
 import React from 'react';
-import { Minus, Square, X, Compass } from 'lucide-react';
+import { Minus, Square, X } from 'lucide-react';
 import { desktopApi } from '../lib/desktop-api';
 import styles from './WindowHeader.module.css';
 
@@ -55,9 +55,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({
     >
       <div className={styles.brandArea} data-tauri-drag-region>
         {showBrand && (
-          <div className={styles.brandMark} data-tauri-drag-region>
-            <Compass size={14} strokeWidth={2.2} />
-          </div>
+          <img src="/icon.png" alt="DeskPilot" className={styles.brandImg} data-tauri-drag-region />
         )}
         <span className={styles.title} data-tauri-drag-region>{title}</span>
       </div>

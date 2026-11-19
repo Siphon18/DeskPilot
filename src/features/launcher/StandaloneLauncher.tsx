@@ -314,7 +314,7 @@ export const StandaloneLauncher: React.FC = () => {
           onMouseDown={handleHeaderMouseDown}
         >
           <div className={styles.brandTag} data-tauri-drag-region>
-            <span className={styles.brandDot} />
+            <img src="/icon.png" alt="DeskPilot" className={styles.brandIconSmall} data-tauri-drag-region />
             <span data-tauri-drag-region>DeskPilot</span>
           </div>
           <span className={styles.closeHint} data-tauri-drag-region>Press Esc to close</span>

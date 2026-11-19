@@ -6,7 +6,6 @@ import {
   Settings,
   Info,
   ShieldCheck,
-  Compass,
 } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './Sidebar.module.css';
@@ -28,9 +27,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside className={styles.sidebar}>
       {/* Brand header */}
       <div className={styles.brand}>
-        <div className={styles.brandMark}>
-          <Compass size={16} strokeWidth={2.2} />
-        </div>
+        <img src="/icon.png" alt="DeskPilot" className={styles.brandImg} />
         <span className={styles.brandTitle}>DeskPilot</span>
       </div>
 

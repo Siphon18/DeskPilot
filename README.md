@@ -1,6 +1,10 @@
-# DeskPilot
+<div align="center">
+  <img src="src-tauri/icons/128x128@2x.png" width="128" height="128" alt="DeskPilot Logo" style="border-radius: 28px;" />
+  <h1>DeskPilot</h1>
+  <p><strong>Lightweight local-first Windows 11 workspace launcher with native Acrylic blur and one-click desktop capture.</strong></p>
+</div>
 
-> **Lightweight local-first Windows workspace launcher that restores your working context in one action.**
+---
 
 DeskPilot is a personal productivity utility built specifically for Windows 11 and 10. A workspace is a saved collection of applications, folders, website links, terminal locations, notes, and checklist items. Instead of repeatedly finding and launching tools whenever you switch between activities (e.g., Development, Study, Finance, Gaming), DeskPilot restores your entire environment with a single click or keyboard shortcut.
 

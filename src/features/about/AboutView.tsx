@@ -1,14 +1,12 @@
 import React from 'react';
-import { Navigation, ShieldCheck, Zap, HardDrive, Keyboard } from 'lucide-react';
+import { ShieldCheck, Zap, HardDrive, Keyboard } from 'lucide-react';
 import styles from './AboutView.module.css';
 
 export const AboutView: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div className={styles.brandBadge}>
-          <Navigation size={28} className={styles.brandIcon} />
-        </div>
+        <img src="/icon.png" alt="DeskPilot Logo" className={styles.brandBadgeImg} />
         <div className={styles.brandText}>
           <h1 className={styles.title}>DeskPilot</h1>
           <p className={styles.version}>Version 1.0.0 (Windows 11 Native)</p>

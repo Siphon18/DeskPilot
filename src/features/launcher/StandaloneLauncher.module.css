@@ -302,6 +302,13 @@
   color: var(--text-secondary);
 }
 
+.brandIconSmall {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  border-radius: 3px;
+}
+
 .brandDot {
   width: 6px;
   height: 6px;
