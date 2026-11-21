@@ -97,6 +97,16 @@ export const App: React.FC = () => {
     let unlistenDashboard: (() => void) | null = null;
     let unlistenCapture: (() => void) | null = null;
     let unlistenLaunchLast: (() => void) | null = null;
+    let unlistenNavigate: (() => void) | null = null;
+
+    listen<NavTab>('app:navigate-tab', (event) => {
+      if (event.payload) {
+        setSelectedWorkspaceId(null);
+        setCurrentTab(event.payload);
+      }
+    }).then((fn) => {
+      unlistenNavigate = fn;
+    });
 
     onQuickSwitcherShow(() => {
       setIsQuickSwitcherOpen(true);
@@ -143,6 +153,7 @@ export const App: React.FC = () => {
       if (unlistenDashboard) unlistenDashboard();
       if (unlistenCapture) unlistenCapture();
       if (unlistenLaunchLast) unlistenLaunchLast();
+      if (unlistenNavigate) unlistenNavigate();
     };
   }, [showToast]);
 

@@ -24,7 +24,12 @@ pub fn launch_application(
         let op_wide = to_wide_null("open");
         let file_wide = to_wide_null(executable_path);
         let params_wide = if !args.is_empty() {
-            Some(to_wide_null(&args.join(" ")))
+            let formatted = args
+                .iter()
+                .map(|a| if a.contains(' ') && !a.starts_with('"') { format!("\"{}\"", a) } else { a.clone() })
+                .collect::<Vec<_>>()
+                .join(" ");
+            Some(to_wide_null(&formatted))
         } else {
             None
         };

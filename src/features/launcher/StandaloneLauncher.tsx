@@ -15,7 +15,7 @@ import {
 import type { WorkspaceDTO } from '../../lib/types';
 import { desktopApi } from '../../lib/desktop-api';
 import { useToast } from '../../components/Toast';
-import { listen } from '@tauri-apps/api/event';
+import { listen, emit } from '@tauri-apps/api/event';
 import styles from './StandaloneLauncher.module.css';
 
 export const StandaloneLauncher: React.FC = () => {
@@ -141,6 +141,7 @@ export const StandaloneLauncher: React.FC = () => {
 
   const handleOpenSettings = async () => {
     try {
+      await emit('app:navigate-tab', 'settings');
       await desktopApi.window.openMainDashboard();
       handleClose();
     } catch {
@@ -150,6 +151,7 @@ export const StandaloneLauncher: React.FC = () => {
 
   const handleOpenNotes = async () => {
     try {
+      await emit('app:navigate-tab', 'notes');
       await desktopApi.window.openMainDashboard();
       handleClose();
     } catch {
@@ -222,7 +224,7 @@ export const StandaloneLauncher: React.FC = () => {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
           />
-          <span className={styles.shortcutBadge}>Ctrl + Space</span>
+          {!query && <span className={styles.shortcutBadge}>Ctrl + Space</span>}
           <button
             className={styles.closeBtn}
             onClick={handleClose}
